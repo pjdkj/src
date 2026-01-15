@@ -20,10 +20,11 @@ function homePage() {
     let layouts = [];
     layouts.push({
         url: $.toString((privacyMode) => {
-            return $('hiker://empty/search?page=fypage&key=' + input + privacyMode).rule((searchVideo) => {
+            return $('hiker://empty/search?page=fypage&key=' + input + privacyMode).rule(() => {
+                require(config.依赖);
                 addListener('onClose', $.toString(() => { setItem('searchParam', ''); }));
                 setResult(searchVideo(getParam('key', ''), MY_PAGE));
-            }, searchVideo);
+            });
         }, privacyMode),
         col_type: 'input',
         title: 'Search',
@@ -47,18 +48,20 @@ function homePage() {
     });
     layouts.push({
         title: '明星',
-        url: $('hiker://empty/star?page=fypage&_t=0' + privacyMode).rule((getStars) => {
+        url: $('hiker://empty/star?page=fypage&_t=0' + privacyMode).rule(() => {
+            require(config.依赖);
             addListener('onClose', $.toString(() => { setItem('starParam', ''); }));
             setResult(getStars(MY_PAGE));
-        }, getStars),
+        }),
         pic_url: 'hiker://images/icon_hot',
         col_type: 'icon_5',
     });
     layouts.push({
         title: '分类',
-        url: $('hiker://empty/sort' + privacyMode).rule((getCategory) => {
+        url: $('hiker://empty/sort' + privacyMode).rule(() => {
+            require(config.依赖);
             setResult(getCategory());
-        }, getCategory),
+        }),
         pic_url: 'hiker://images/icon_top',
         col_type: 'icon_5',
     });
