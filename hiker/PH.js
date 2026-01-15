@@ -2,19 +2,19 @@ function homePage() {
     if (getItem('confirmButton', '0') == '0') {
         setItem('confirmButton', '1');
         confirm({
-            title: 'ÃâÔğÉùÃ÷',
-            content: "        ±¾¹æÔò½ö¶ÔÍøÒ³Ô´´úÂëÖØĞÂÅÅ°æºóÏÔÊ¾£¬²¢²»Ìá¹©Ô­Ê¼Êı¾İ£¬½ö¹©Ğ´Ô´°®ºÃÕßÑ§Ï°½»Á÷Ê¹ÓÃ£¬ÇëÎñ±ØÔÚµ¼Èë24Ğ¡Ê±Ö®ÄÚÉ¾³ı¡£´ËÉùÃ÷½öµ¯³öÒ»´Î£¬»òÔÚÉèÖÃ²é¿´",
-            confirm: $.toString(() => { return 'toast://ÎÒÖªµÀÁË' }),
-            cancel: $.toString(() => { return 'toast://ÎÒÖªµÀÁË' }),
+            title: 'å…è´£å£°æ˜',
+            content: "        æœ¬è§„åˆ™ä»…å¯¹ç½‘é¡µæºä»£ç é‡æ–°æ’ç‰ˆåæ˜¾ç¤ºï¼Œå¹¶ä¸æä¾›åŸå§‹æ•°æ®ï¼Œä»…ä¾›å†™æºçˆ±å¥½è€…å­¦ä¹ äº¤æµä½¿ç”¨ï¼Œè¯·åŠ¡å¿…åœ¨å¯¼å…¥24å°æ—¶ä¹‹å†…åˆ é™¤ã€‚æ­¤å£°æ˜ä»…å¼¹å‡ºä¸€æ¬¡ï¼Œæˆ–åœ¨è®¾ç½®æŸ¥çœ‹",
+            confirm: $.toString(() => { return 'toast://æˆ‘çŸ¥é“äº†' }),
+            cancel: $.toString(() => { return 'toast://æˆ‘çŸ¥é“äº†' }),
         })
     }
     let urls = {
-        Ö÷Ò³: 'https://cn.pornhub.com',
-        ×îĞÂ¾«Ñ¡: 'https://cn.pornhub.com/video',
-        ×îÈÈÃÅ: 'https://cn.pornhub.com/video?o=ht',
-        ×î¶à¹Û¿´: 'https://cn.pornhub.com/video?o=mv',
-        ×î¸ß·Ö: 'https://cn.pornhub.com/video?o=tr',
-        ×î³¤: 'https://cn.pornhub.com/video?o=lg',
+        ä¸»é¡µ: 'https://cn.pornhub.com',
+        æœ€æ–°ç²¾é€‰: 'https://cn.pornhub.com/video',
+        æœ€çƒ­é—¨: 'https://cn.pornhub.com/video?o=ht',
+        æœ€å¤šè§‚çœ‹: 'https://cn.pornhub.com/video?o=mv',
+        æœ€é«˜åˆ†: 'https://cn.pornhub.com/video?o=tr',
+        æœ€é•¿: 'https://cn.pornhub.com/video?o=lg',
     };
     let privacyMode = getItem('privacyMode', '#noHistory##noRecordHistory#');
     let layouts = [];
@@ -28,9 +28,9 @@ function homePage() {
         col_type: 'input',
         title: 'Search',
     });
-    let jingxuan = ['Ö÷Ò³', '×îĞÂ¾«Ñ¡', '×îÈÈÃÅ', '×î¶à¹Û¿´', '×î¸ß·Ö', '×î³¤'];
+    let jingxuan = ['ä¸»é¡µ', 'æœ€æ–°ç²¾é€‰', 'æœ€çƒ­é—¨', 'æœ€å¤šè§‚çœ‹', 'æœ€é«˜åˆ†', 'æœ€é•¿'];
     layouts.push({
-        title: '¾«Ñ¡',
+        title: 'ç²¾é€‰',
         url: $(jingxuan, 2, '').select(() => {
             setItem('jx', input);
             setItem('p', '1');
@@ -40,13 +40,13 @@ function homePage() {
         col_type: 'icon_5',
     });
     layouts.push({
-        title: '¶ÌÆ¬',
+        title: 'çŸ­ç‰‡',
         url: 'https://cn.pornhub.com/shorties' + privacyMode,
         pic_url: 'hiker://images/bbs',
         col_type: 'icon_5',
     });
     layouts.push({
-        title: 'Ã÷ĞÇ',
+        title: 'æ˜æ˜Ÿ',
         url: $('hiker://empty/star?page=fypage&_t=0' + privacyMode).rule((getStars) => {
             addListener('onClose', $.toString(() => { setItem('starParam', ''); }));
             setResult(getStars(MY_PAGE));
@@ -55,7 +55,7 @@ function homePage() {
         col_type: 'icon_5',
     });
     layouts.push({
-        title: '·ÖÀà',
+        title: 'åˆ†ç±»',
         url: $('hiker://empty/sort' + privacyMode).rule((getCategory) => {
             setResult(getCategory());
         }, getCategory),
@@ -63,7 +63,7 @@ function homePage() {
         col_type: 'icon_5',
     });
     layouts.push({
-        title: 'ÉèÖÃ',
+        title: 'è®¾ç½®',
         url: $('hiker://empty/setting' + privacyMode).rule((settingPage) => {
             setResult(settingPage());
         }, settingPage),
@@ -78,11 +78,11 @@ function homePage() {
         case '4': layout_style = 'movie_2'; break;
         default: layout_style = 'movie_2';
     }
-    let jx1 = getItem('jx', 'Ö÷Ò³');
+    let jx1 = getItem('jx', 'ä¸»é¡µ');
     let url = urls[jx1];
     let select = '';
-    if (jx1 != 'Ö÷Ò³') {
-        if (jx1 == '×îĞÂ¾«Ñ¡') {
+    if (jx1 != 'ä¸»é¡µ') {
+        if (jx1 == 'æœ€æ–°ç²¾é€‰') {
             url = url + '?page=' + getItem('p', '1');
         } else {
             url = url + '&page=' + getItem('p', '1');
@@ -103,13 +103,13 @@ function homePage() {
             });
         } catch (e) { }
     });
-    if (jx1 != 'Ö÷Ò³') {
+    if (jx1 != 'ä¸»é¡µ') {
         layouts.push(
             {
                 col_type: 'blank_block',
             },
             {
-                title: 'ÉÏÒ»Ò³',
+                title: 'ä¸Šä¸€é¡µ',
                 url: $('').lazyRule(() => {
                     let p = Number(getItem('p', '1'));
                     if (p > 1) {
@@ -122,7 +122,7 @@ function homePage() {
                 col_type: 'text_3',
             },
             {
-                title: 'ÏÂÒ»Ò³',
+                title: 'ä¸‹ä¸€é¡µ',
                 url: $('').lazyRule(() => {
                     let p = Number(getItem('p', '1'));
                     p = p + 1;
@@ -133,15 +133,15 @@ function homePage() {
                 col_type: 'text_3',
             },
             {
-                title: '×ÔÑ¡Ò³',
-                url: $('', 'Ò³Êı').input(() => {
+                title: 'è‡ªé€‰é¡µ',
+                url: $('', 'é¡µæ•°').input(() => {
                     let p = parseInt(input.trim());
                     if (!isNaN(p)) {
                         setItem('p', p.toString());
                         refreshPage();
                         return 'hiker://empty';
                     } else {
-                        return 'toast://ÇëÊäÈëÊı×Ö';
+                        return 'toast://è¯·è¾“å…¥æ•°å­—';
                     }
                 }),
                 col_type: 'text_3',
@@ -155,7 +155,7 @@ function searchVideo(key, page) {
     if (page == '1') {
         layouts.push(
             {
-                title: '×îÏà¹Ø',
+                title: 'æœ€ç›¸å…³',
                 url: $('#noLoading#').lazyRule(() => {
                     if (getItem('searchParam', '') != '') {
                         setItem('searchParam', '');
@@ -166,7 +166,7 @@ function searchVideo(key, page) {
                 col_type: 'flex_button',
             },
             {
-                title: '×îĞÂ',
+                title: 'æœ€æ–°',
                 url: $('#noLoading#').lazyRule(() => {
                     if (getItem('searchParam', '') != '&o=mr') {
                         setItem('searchParam', '&o=mr');
@@ -177,7 +177,7 @@ function searchVideo(key, page) {
                 col_type: 'flex_button',
             },
             {
-                title: '×î¶à¹Û¿´',
+                title: 'æœ€å¤šè§‚çœ‹',
                 url: $('#noLoading#').lazyRule(() => {
                     if (getItem('searchParam', '') != '&o=mv') {
                         setItem('searchParam', '&o=mv');
@@ -188,7 +188,7 @@ function searchVideo(key, page) {
                 col_type: 'flex_button',
             },
             {
-                title: '×î¸ß·Ö',
+                title: 'æœ€é«˜åˆ†',
                 url: $('#noLoading#').lazyRule(() => {
                     if (getItem('searchParam', '') != '&o=tr') {
                         setItem('searchParam', '&o=tr');
@@ -199,7 +199,7 @@ function searchVideo(key, page) {
                 col_type: 'flex_button',
             },
             {
-                title: '×î³¤',
+                title: 'æœ€é•¿',
                 url: $('#noLoading#').lazyRule(() => {
                     if (getItem('searchParam', '') != '&o=lg') {
                         setItem('searchParam', '&o=lg');
@@ -236,7 +236,7 @@ function searchVideo(key, page) {
             layouts.push({
                 title: pdfh(li, '.title&&Text'),
                 img: pdfh(li, 'img&&data-path'),
-                desc: pdfh(li, '.videoViews&&Text') + '´Î¹Û¿´',
+                desc: pdfh(li, '.videoViews&&Text') + 'æ¬¡è§‚çœ‹',
                 url: 'https://cn.pornhub.com' + pdfh(li, '.title&&a&&href') + privacyMode,
                 col_type: layout_style,
             });
@@ -247,7 +247,7 @@ function searchVideo(key, page) {
 function getStars(page) {
     let layouts = [];
     let privacyMode = getItem('privacyMode', '#noHistory##noRecordHistory#');
-    let sorts = ['×îÊÜ»¶Ó­', '×î¶à¹Û¿´', '×îÈÈÃÅ', '×î¶à¶©ÔÄ', '×ÖÄ¸Ë³Ğò', 'ÊÓÆµÊıÁ¿', 'Ëæ»ú'];
+    let sorts = ['æœ€å—æ¬¢è¿', 'æœ€å¤šè§‚çœ‹', 'æœ€çƒ­é—¨', 'æœ€å¤šè®¢é˜…', 'å­—æ¯é¡ºåº', 'è§†é¢‘æ•°é‡', 'éšæœº'];
     let params = ['', '&o=mv', '&o=t', '&o=ms', '&o=a', '&o=nv', '&o=r'];
     if (page == '1') {
         for (let i = 0; i < sorts.length; i++) {
@@ -285,7 +285,7 @@ function getStars(page) {
 function getStarDetails(link, page) {
     let layouts = [];
     let big = $.require('jsLib').big;
-    let sorts = ['×î¼Ñ', '×îĞÂ', '×î¶à¹Û¿´', '×î¸ß·Ö', '×î³¤'];
+    let sorts = ['æœ€ä½³', 'æœ€æ–°', 'æœ€å¤šè§‚çœ‹', 'æœ€é«˜åˆ†', 'æœ€é•¿'];
     let params = ['', '&o=mr', '&o=mv', '&o=tr', '&o=lg'];
     let privacyMode = getItem('privacyMode', '#noHistory##noRecordHistory#');
     let url = 'https://cn.pornhub.com' + link + '/videos' + '?page=' + page + getItem('starDetailParam', '') + privacyMode;
@@ -293,7 +293,7 @@ function getStarDetails(link, page) {
     let res = fetch(url);
     if (page == '1') {
         layouts.push({
-            title: '¡®¡®¡¯¡¯' + big(pdfh(res, '.avatarWrapper&&img&&alt')),
+            title: 'â€˜â€˜â€™â€™' + big(pdfh(res, '.avatarWrapper&&img&&alt')),
             desc: pdfh(res, '.mobileRanksButton&&Text'),
             img: pdfh(res, '.avatarWrapper&&img&&src'),
             col_type: 'movie_1_vertical_pic_blur',
@@ -374,7 +374,7 @@ function getCategory() {
 }
 function getCategoryDetails(link, page) {
     let layouts = [];
-    let sorts = ['¾«Ñ¡', '×î¶à¹Û¿´', '×îÈÈÃÅ', '×î¸ß·Ö', '×î³¤', '×îĞÂ'];
+    let sorts = ['ç²¾é€‰', 'æœ€å¤šè§‚çœ‹', 'æœ€çƒ­é—¨', 'æœ€é«˜åˆ†', 'æœ€é•¿', 'æœ€æ–°'];
     let params = ['', '&o=mv', '&o=ht', '&o=tr', '&o=lg', '&o=cm'];
     if (page == '1') {
         for (let i = 0; i < sorts.length; i++) {
@@ -450,15 +450,15 @@ function settingPage() {
 
     let layouts = [];
     let ls = getItem('layout_style', '4');
-    setPageTitle('ÉèÖÃ');
+    setPageTitle('è®¾ç½®');
     layouts.push(
         {
-            title: small(b('²¼¾Ö')),
+            title: small(b('å¸ƒå±€')),
             img: 'hiker://images/home_setting',
             col_type: 'avatar',
         },
         {
-            title: b('Ò»ÁĞ´óÍ¼'),
+            title: b('ä¸€åˆ—å¤§å›¾'),
             img: ls == '1' ? 'hiker://images/icon_rect_selected' : 'hiker://images/icon_rect',
             url: $('#noLoading#').lazyRule(() => {
                 let sty = getItem('layout_style', '4');
@@ -476,7 +476,7 @@ function settingPage() {
             },
         },
         {
-            title: b('Ò»ÁĞÍ¼×ó'),
+            title: b('ä¸€åˆ—å›¾å·¦'),
             img: ls == '2' ? 'hiker://images/icon_rect_selected' : 'hiker://images/icon_rect',
             url: $('#noLoading#').lazyRule(() => {
                 let sty = getItem('layout_style', '4');
@@ -494,7 +494,7 @@ function settingPage() {
             },
         },
         {
-            title: b('Ò»ÁĞÍ¼ÓÒ'),
+            title: b('ä¸€åˆ—å›¾å³'),
             img: ls == '3' ? 'hiker://images/icon_rect_selected' : 'hiker://images/icon_rect',
             url: $('#noLoading#').lazyRule(() => {
                 let sty = getItem('layout_style', '4');
@@ -512,7 +512,7 @@ function settingPage() {
             },
         },
         {
-            title: b('Ò»ĞĞÁ½ÁĞ'),
+            title: b('ä¸€è¡Œä¸¤åˆ—'),
             img: ls == '4' ? 'hiker://images/icon_rect_selected' : 'hiker://images/icon_rect',
             url: $('#noLoading#').lazyRule(() => {
                 let sty = getItem('layout_style', '4');
@@ -535,12 +535,12 @@ function settingPage() {
     );
     layouts.push(
         {
-            title: small(b('ÆäËü')),
+            title: small(b('å…¶å®ƒ')),
             img: 'hiker://images/home_setting',
             col_type: 'avatar',
         },
         {
-            title: b('ÒşÉíÄ£Ê½'),
+            title: b('éšèº«æ¨¡å¼'),
             img: getItem('privacyMode', '#noHistory##noRecordHistory#') == '' ? 'hiker://images/icon_rect' : 'hiker://images/icon_rect_selected',
             url: $('#noLoading#').lazyRule(() => {
                 let pm = getItem('privacyMode', '#noHistory##noRecordHistory#');
@@ -559,26 +559,26 @@ function settingPage() {
             }
         },
         {
-            title: b('Õ¼Î»ÎÄ×Ö'),
+            title: b('å ä½æ–‡å­—'),
             img: 'hiker://images/icon_rect',
             url: $('#noLoading#').lazyRule(() => {
-                return 'toast://¿ª·¢ÖĞ';
+                return 'toast://å¼€å‘ä¸­';
             }),
             col_type: 'text_icon',
         },
         {
-            title: b('Õ¼Î»ÎÄ×Ö'),
+            title: b('å ä½æ–‡å­—'),
             img: 'hiker://images/icon_rect',
             url: $('#noLoading#').lazyRule(() => {
-                return 'toast://¿ª·¢ÖĞ';
+                return 'toast://å¼€å‘ä¸­';
             }),
             col_type: 'text_icon',
         },
         {
-            title: b('Õ¼Î»ÎÄ×Ö'),
+            title: b('å ä½æ–‡å­—'),
             img: 'hiker://images/icon_rect',
             url: $('#noLoading#').lazyRule(() => {
-                return 'toast://¿ª·¢ÖĞ';
+                return 'toast://å¼€å‘ä¸­';
             }),
             col_type: 'text_icon',
         },
@@ -589,11 +589,11 @@ function settingPage() {
     layouts.push(
         {
             title:
-                small(b('¸üĞÂÈÕÆÚ£º2025-05-14 &nbsp;&nbsp; By &nbsp; Æ½¾²')) +
+                small(b('æ›´æ–°æ—¥æœŸï¼š2025-05-14 &nbsp;&nbsp; By &nbsp; å¹³é™')) +
                 br() +
-                small('1.·µ»ØºóË¢ĞÂ') +
+                small('1.è¿”å›ååˆ·æ–°') +
                 br() +
-                small(colorFont('#ff2700', '2.½ûÖ¹×ªÔØ')),
+                small(colorFont('#ff2700', '2.ç¦æ­¢è½¬è½½')),
             col_type: 'rich_text',
             extra: { lineSpacing: 8 },
         },
@@ -603,12 +603,12 @@ function settingPage() {
     );
     layouts.push(
         {
-            title: '¡®¡®¡¯¡¯<big>ÃâÔğÉùÃ÷</big>',
+            title: 'â€˜â€˜â€™â€™<big>å…è´£å£°æ˜</big>',
             url: 'hiker://empty',
             col_type: 'text_center_1',
         },
         {
-            title: small('&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;±¾¹æÔò½ö¶ÔÍøÒ³Ô´´úÂëÖØĞÂÅÅ°æºóÏÔÊ¾£¬²¢') + small(colorFont('#ff2700', '²»Ìá¹©Ô­Ê¼Êı¾İ')) + small('½ö¹©Ğ´Ô´°®ºÃÕßÑ§Ï°½»Á÷Ê¹ÓÃ£¬ÇëÎñ±ØÔÚµ¼Èë') + small(colorFont('#ff2700', '24Ğ¡Ê±Ö®ÄÚÉ¾³ı')) + small('¡£'),
+            title: small('&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;æœ¬è§„åˆ™ä»…å¯¹ç½‘é¡µæºä»£ç é‡æ–°æ’ç‰ˆåæ˜¾ç¤ºï¼Œå¹¶') + small(colorFont('#ff2700', 'ä¸æä¾›åŸå§‹æ•°æ®')) + small('ä»…ä¾›å†™æºçˆ±å¥½è€…å­¦ä¹ äº¤æµä½¿ç”¨ï¼Œè¯·åŠ¡å¿…åœ¨å¯¼å…¥') + small(colorFont('#ff2700', '24å°æ—¶ä¹‹å†…åˆ é™¤')) + small('ã€‚'),
             col_type: 'rich_text',
             extra: { lineSpacing: 8 },
         }
