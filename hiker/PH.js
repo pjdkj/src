@@ -101,18 +101,7 @@ function homePage() {
                 title: pdfh(li, '.title&&Text'),
                 img: pdfh(li, 'img&&data-path'),
                 desc: pdfh(li, '.views&&Text'),
-                url: $('https://cn.pornhub.com' + pdfh(li, '.title&&a&&href') + privacyMode).rule(() => {
-                    let layouts = [];
-                    layouts.push({
-                        url: MY_URL,
-                        col_type: "x5_webview_single",
-                        desc: "list&&screen",
-                        extra: {
-                            ua: MOBILE_UA
-                        }
-                    });
-                    setResult(layouts);
-                }),
+                url: 'https://cn.pornhub.com' + pdfh(li, '.title&&a&&href') + privacyMode,
                 col_type: layout_style
             });
         } catch (e) { }
