@@ -105,7 +105,7 @@ function homePage() {
                     let layouts = [];
                     layouts.push({
                         title: "视频",
-                        url: input,
+                        url: MY_URL,
                         col_type: "x5_webView_single",
                         desc: "list&&screen",
                         extra: {
