@@ -101,7 +101,19 @@ function homePage() {
                 title: pdfh(li, '.title&&Text'),
                 img: pdfh(li, 'img&&data-path'),
                 desc: pdfh(li, '.views&&Text'),
-                url: 'https://cn.pornhub.com' + pdfh(li, '.title&&a&&href') + privacyMode,
+                url: $('https://cn.pornhub.com' + pdfh(li, '.title&&a&&href') + privacyMode).rule(() => {
+                    let layouts = [];
+                    layouts.push({
+                        title: "视频",
+                        url: input,
+                        col_type: "x5_webView_single",
+                        desc: "list&&screen",
+                        extra: {
+                            ua: MOBILE_UA
+                        }
+                    });
+                    setResult(layouts);
+                }),
                 col_type: layout_style
             });
         } catch (e) { }
@@ -125,17 +137,6 @@ function homePage() {
                 col_type: 'text_3',
             },
             {
-                title: '下一页',
-                url: $('').lazyRule(() => {
-                    let p = Number(getItem('p', '1'));
-                    p = p + 1;
-                    setItem('p', p.toString());
-                    refreshPage();
-                    return 'hiker://empty';
-                }),
-                col_type: 'text_3',
-            },
-            {
                 title: '自选页',
                 url: $('', '页数').input(() => {
                     let p = parseInt(input.trim());
@@ -146,6 +147,17 @@ function homePage() {
                     } else {
                         return 'toast://请输入数字';
                     }
+                }),
+                col_type: 'text_3',
+            },
+            {
+                title: '下一页',
+                url: $('').lazyRule(() => {
+                    let p = Number(getItem('p', '1'));
+                    p = p + 1;
+                    setItem('p', p.toString());
+                    refreshPage();
+                    return 'hiker://empty';
                 }),
                 col_type: 'text_3',
             }
