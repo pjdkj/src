@@ -1,6 +1,6 @@
 function yanzhengd(d, str, url, host, a, ua) {
     d.push({
-        title: '人机验证',
+        title: '浜烘満楠岃瘉',
         url: $('hiker://empty').rule((str, url, t, a, ua) => {
             var d = [];
             d.push({
