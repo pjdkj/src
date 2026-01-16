@@ -102,9 +102,9 @@ function homePage() {
                 img: pdfh(li, 'img&&data-path'),
                 desc: pdfh(li, '.views&&Text'),
                 url: $('https://cn.pornhub.com' + pdfh(li, '.title&&a&&href') + privacyMode).rule(() => {
+                    log(MY_URL);
                     let layouts = [];
                     layouts.push({
-                        title: "视频",
                         url: MY_URL,
                         col_type: "x5_webView_single",
                         desc: "list&&screen",
