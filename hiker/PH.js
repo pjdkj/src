@@ -286,8 +286,10 @@ function getStars(page) {
     return layouts
 }
 function getStarDetails(link, page) {
+    function big(e) {
+        return '<big>' + e + '</big>'
+    }
     let layouts = [];
-    let big = $.require('jsLib').big;
     let sorts = ['最佳', '最新', '最多观看', '最高分', '最长'];
     let params = ['', '&o=mr', '&o=mv', '&o=tr', '&o=lg'];
     let privacyMode = getItem('privacyMode', '#noHistory##noRecordHistory#');
@@ -434,22 +436,7 @@ function getCategoryDetails(link, page) {
     return layouts;
 }
 function settingPage() {
-
-    function colorFont(c, f) {
-        return '<font color="' + c + '">' + f + '</font>'
-    }
-    function big(e) {
-        return '<big>' + e + '</big>'
-    }
-    function small(e) {
-        return '<small>' + e + '</small>'
-    }
-    function b(e) {
-        return '<b>' + e + '</b>'
-    }
-    function br() {
-        return '<br>'
-    }
+    require(config.依赖);
 
     let layouts = [];
     let ls = getItem('layout_style', '4');
@@ -617,4 +604,19 @@ function settingPage() {
         }
     );
     return layouts;
+}
+function colorFont(c, f) {
+    return '<font color="' + c + '">' + f + '</font>'
+}
+function big(e) {
+    return '<big>' + e + '</big>'
+}
+function small(e) {
+    return '<small>' + e + '</small>'
+}
+function b(e) {
+    return '<b>' + e + '</b>'
+}
+function br() {
+    return '<br>'
 }
