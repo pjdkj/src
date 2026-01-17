@@ -102,13 +102,19 @@ function danyeHtml(imgSrc) {
                 .gallery img[loaded] {
                     opacity: 1;
                 }
+        #load-finish {
+            text-align: center;
+            color: #999;
+            font-size: 14px;
+            padding: 20px 0 10px;
+        }
     </style>
 </head>
 <body>
     <ul class="gallery">
         ${imgTags}
     </ul>
-
+    <div id="load-finish">已加载全部内容</div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/viewerjs/1.10.0/viewer.min.js"></script>
     <script>
         const CONFIG = {
