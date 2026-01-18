@@ -489,7 +489,7 @@ function duoyeHtml(params) {
 
     // --- 0. 复用第一页请求结果 ---
     <script id="first-page-data" type="application/json">
-        ${escapeHtml(result)}
+        "${escapeHtml(result)}"
     </script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/viewerjs/1.10.0/viewer.min.js"></script>
