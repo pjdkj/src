@@ -1,6 +1,6 @@
 /*
-适用于原网页图片不分页的情况
-imgSrc(String)阅读获取的图片src,多张图片默认以换行符分隔
+该函数适用于原网页图片不分页的情况
+输入imgSrc(String)阅读获取的图片src,多张图片默认以换行符分隔
 
 调用示例:
 class.list-gallery@img@src
@@ -291,7 +291,7 @@ function danyeHtml(imgSrc) {
 }
 
 /*
- 适用于原网页图片分多页加载
+ 该函数适用于原网页图片分多页加载
  params是一个对象，必须包含：
     - totalPage: string  //总页数
     - baseUrl: string  //基础URL，用于拼接下一页URL
