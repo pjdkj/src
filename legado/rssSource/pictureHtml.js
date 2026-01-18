@@ -393,10 +393,6 @@ function duoyeHtml(params) {
     }
     imageSelector = imageSelector.trim();
 
-    // 转义 HTML 特殊字符
-    const { java } = this;
-    java.log(encodeURIComponent(result));
-
     return `<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -474,11 +470,9 @@ function duoyeHtml(params) {
     <ul class="gallery"></ul>
     <div id="load-status"></div>
 
-    // --- 0. 复用第一页请求结果 ---
     <script id="first-page-data" type="application/json">
         ${encodeURIComponent(result)}
     </script>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/viewerjs/1.10.0/viewer.min.js"></script>
     <script>
         const CONFIG = {
@@ -505,7 +499,8 @@ function duoyeHtml(params) {
         let loadFailed = false;
         let pageObserver = null;
         const imageAbortControllers = new Map();
-
+        
+        // 复用第一页请求结果
         const FIRST_PAGE_HTML = document.getElementById('first-page-data').textContent;
         function parseImagesFromHtml(htmlText) {
             const doc = new DOMParser().parseFromString(htmlText, 'text/html');
