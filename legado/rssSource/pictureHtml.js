@@ -2,7 +2,7 @@
 该函数适用于原网页图片不分页的情况
 输入imgSrc(String)阅读获取的图片src,多张图片默认以换行符分隔
 
-调用示例:
+阅读调用示例:
 class.list-gallery@img@src
 <js>
 danyeHtml(result);
@@ -293,14 +293,16 @@ function danyeHtml(imgSrc) {
 /*
  该函数适用于原网页图片分多页加载
  params是一个对象，必须包含：
+    - result: string // 复用已经得到的第一页的请求结果
     - totalPage: string or Number //总页数
     - baseUrl: string  //基础URL，用于拼接下一页URL
     - pageUrlTemplate: string  //下一页URL模板，必须包含{baseUrl}和{page}占位符
     - imageSelector: string  //img标签选择器CSS，用于从页面中提取图片的img标签
 
-调用示例:
+阅读调用示例:
 <js>
 let params = {
+    result: `${String(result)}`,
     totalPage: String(java.getString("@@class.page-indicator@ownText")).replace("/",""),
     baseUrl: `${baseUrl}`,
     pageUrlTemplate: "{baseUrl}?page={page}",
@@ -318,11 +320,24 @@ function duoyeHtml(params) {
     }
 
     let {
+        result,
         totalPage,
         baseUrl,
         pageUrlTemplate,
         imageSelector
     } = params;
+
+    // 校验 result 
+    if (typeof result !== 'string') {
+        throw new TypeError(
+            `result 必须是 string 类型（第一页 HTML 文本），当前值：${JSON.stringify(result)}`
+        );
+    }
+    if (result.trim() === '') {
+        throw new TypeError(
+            'result 不能为空字符串（第一页 HTML 内容为空）'
+        );
+    }
 
     // 校验 totalPage（支持 number / string）
     if (typeof totalPage === 'number') {
@@ -476,11 +491,18 @@ function duoyeHtml(params) {
             }
         };
 
-        let page = 1;
+        let page = 2;
         let isLoading = false;
         let loadFailed = false;
         let pageObserver = null;
         const imageAbortControllers = new Map();
+
+        // --- 0. 复用第一页请求结果 ---
+        const FIRST_PAGE_HTML = ${JSON.stringify(result)};
+        function parseImagesFromHtml(htmlText) {
+            const doc = new DOMParser().parseFromString(htmlText, 'text/html');
+            return Array.from(doc.querySelectorAll(CONFIG.imageSelector)).map(img => img.src);
+        }
 
         // --- 1. Viewer.js 管理 ---
         const viewerManager = {
@@ -734,8 +756,17 @@ function duoyeHtml(params) {
         // --- 初始化 ---
         document.addEventListener('DOMContentLoaded', () => {
             viewerManager.init();
+
+            try {
+                const firstPageImages = parseImagesFromHtml(FIRST_PAGE_HTML);
+                if (firstPageImages.length > 0) {
+                    appendImagesToDOM(firstPageImages);
+                }
+            } catch (e) {
+                console.error('解析第一页结果失败', e);
+            }
+
             initPagination();
-            loadMorePages();
         });
 
         window.addEventListener('resize', () => viewerManager.update());
