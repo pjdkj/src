@@ -749,7 +749,7 @@ function duoyeHtml(params) {
 
             } catch (error) {
                 console.error(error);
-                document.querySelector(CONFIG.selectors.loadStatus).innerHTML = '< span style = "color:red" >' + CONFIG.errorText + '</span >';
+                document.querySelector(CONFIG.selectors.loadStatus).innerHTML = '<span style="color:red">' + CONFIG.errorText + '</span>';
                 loadFailed = true;
             } finally {
                 isLoading = false;
