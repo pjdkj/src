@@ -410,6 +410,9 @@ function duoyeHtml(params) {
         });
     }
 
+    const { java } = this;
+    java.log(escapeHtml(result));
+
     return `<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
