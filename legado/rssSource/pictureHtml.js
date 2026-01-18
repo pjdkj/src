@@ -28,7 +28,7 @@ function danyeHtml(imgSrc) {
         return acc;
     }, []);
 
-    let imgTags = '\n' + imgArr.join('\n') + '\n';
+    let imgTags = imgArr.join('\n');
 
     return `<!DOCTYPE html>
 <html lang="zh-CN">
@@ -293,16 +293,90 @@ function danyeHtml(imgSrc) {
 /*
  该函数适用于原网页图片分多页加载
  params是一个对象，必须包含：
-    - totalPage: string  //总页数
+    - totalPage: string or Number //总页数
     - baseUrl: string  //基础URL，用于拼接下一页URL
     - pageUrlTemplate: string  //下一页URL模板，必须包含{baseUrl}和{page}占位符
     - imageSelector: string  //img标签选择器CSS，用于从页面中提取图片的img标签
+
+调用示例:
+<js>
+let params = {
+    totalPage: String(java.getString("@@class.page-indicator@ownText")).replace("/",""),
+    baseUrl: `${baseUrl}`,
+    pageUrlTemplate: "{baseUrl}?page={page}",
+    imageSelector: "figure img",
+}
+duoyeHtml(params)
+</js>
  */
 function duoyeHtml(params) {
     // 参数校验
-    if (typeof params !== 'object' || params === null) {
-        throw new Error('参数必须是一个对象');
+    if (Object.prototype.toString.call(params) !== '[object Object]') {
+        throw new TypeError(
+            `params 必须是一个对象，当前值：${JSON.stringify(params)}`
+        );
     }
+
+    let {
+        totalPage,
+        baseUrl,
+        pageUrlTemplate,
+        imageSelector
+    } = params;
+
+    // 校验 totalPage（支持 number / string）
+    if (typeof totalPage === 'number') {
+        if (!Number.isSafeInteger(totalPage) || totalPage <= 0) {
+            throw new TypeError(
+                `params.totalPage 为 number 时，必须是大于 0 的安全整数，当前值：${JSON.stringify(totalPage)}`
+            );
+        }
+        totalPage = String(totalPage);
+    } else if (typeof totalPage === 'string') {
+        const raw = totalPage.trim();
+        if (!/^[1-9]\d*$/.test(raw)) {
+            throw new TypeError(
+                `params.totalPage 为 string 时，必须是正整数字符串，如 "1"、"10"，当前值：${JSON.stringify(totalPage)}`
+            );
+        }
+        totalPage = String(Number(raw));
+    } else {
+        throw new TypeError(
+            `params.totalPage 只允许 number 或 string 类型，当前值：${JSON.stringify(totalPage)}`
+        );
+    }
+
+    // 校验 baseUrl
+    if (typeof baseUrl !== 'string' || baseUrl.trim() === '') {
+        throw new TypeError(
+            `params.baseUrl 必须是非空字符串，当前值：${JSON.stringify(baseUrl)}`
+        );
+    }
+    baseUrl = baseUrl.trim();
+
+    // 校验 pageUrlTemplate
+    if (typeof pageUrlTemplate !== 'string' || pageUrlTemplate.trim() === '') {
+        throw new TypeError(
+            `params.pageUrlTemplate 必须是非空字符串，当前值：${JSON.stringify(pageUrlTemplate)}`
+        );
+    }
+
+    if (
+        !pageUrlTemplate.includes('{baseUrl}') ||
+        !pageUrlTemplate.includes('{page}')
+    ) {
+        throw new Error(
+            `params.pageUrlTemplate 必须包含 {baseUrl} 和 {page} 占位符，当前值：${JSON.stringify(pageUrlTemplate)}`
+        );
+    }
+
+    // 校验 imageSelector
+    if (typeof imageSelector !== 'string' || imageSelector.trim() === '') {
+        throw new TypeError(
+            `params.imageSelector 必须是合法的 CSS 选择器字符串，当前值：${JSON.stringify(imageSelector)}`
+        );
+    }
+    imageSelector = imageSelector.trim();
 
     return `<!DOCTYPE html>
 <html lang="zh-CN">
