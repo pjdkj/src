@@ -394,24 +394,8 @@ function duoyeHtml(params) {
     imageSelector = imageSelector.trim();
 
     // 转义 HTML 特殊字符
-    function escapeHtml(str) {
-        const entityMap = {
-            '&': '&amp;',
-            '<': '&lt;',
-            '>': '&gt;',
-            '"': '&quot;',
-            "'": '&#39;',
-            '/': '&#x2F;',
-            '`': '&#x60;',
-            '=': '&#x3D;'
-        };
-        return str.replace(/[&<>"'`=\/]/g, function (s) {
-            return entityMap[s];
-        });
-    }
-
     const { java } = this;
-    java.log(escapeHtml(result));
+    java.log(encodeURIComponent(result));
 
     return `<!DOCTYPE html>
 <html lang="zh-CN">
@@ -492,7 +476,7 @@ function duoyeHtml(params) {
 
     // --- 0. 复用第一页请求结果 ---
     <script id="first-page-data" type="application/json">
-        "${escapeHtml(result)}"
+        ${encodeURIComponent(result)}
     </script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/viewerjs/1.10.0/viewer.min.js"></script>
@@ -782,7 +766,7 @@ function duoyeHtml(params) {
             viewerManager.init();
 
             try {
-                const firstPageImages = parseImagesFromHtml(FIRST_PAGE_HTML);
+                const firstPageImages = parseImagesFromHtml(decodeURIComponent(FIRST_PAGE_HTML));
                 if (firstPageImages.length > 0) {
                     appendImagesToDOM(firstPageImages);
                 }
