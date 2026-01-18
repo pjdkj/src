@@ -393,6 +393,23 @@ function duoyeHtml(params) {
     }
     imageSelector = imageSelector.trim();
 
+    // 转义 HTML 特殊字符
+    function escapeHtml(str) {
+        const entityMap = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#39;',
+            '/': '&#x2F;',
+            '`': '&#x60;',
+            '=': '&#x3D;'
+        };
+        return str.replace(/[&<>"'`=\/]/g, function (s) {
+            return entityMap[s];
+        });
+    }
+
     return `<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -470,6 +487,11 @@ function duoyeHtml(params) {
     <ul class="gallery"></ul>
     <div id="load-status"></div>
 
+    // --- 0. 复用第一页请求结果 ---
+    <script id="first-page-data" type="application/json">
+        ${escapeHtml(result)}
+    </script>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/viewerjs/1.10.0/viewer.min.js"></script>
     <script>
         const CONFIG = {
@@ -497,8 +519,7 @@ function duoyeHtml(params) {
         let pageObserver = null;
         const imageAbortControllers = new Map();
 
-        // --- 0. 复用第一页请求结果 ---
-        const FIRST_PAGE_HTML = ${JSON.stringify(result)};
+        const FIRST_PAGE_HTML = document.getElementById('first-page-data').textContent;
         function parseImagesFromHtml(htmlText) {
             const doc = new DOMParser().parseFromString(htmlText, 'text/html');
             return Array.from(doc.querySelectorAll(CONFIG.imageSelector)).map(img => img.src);
