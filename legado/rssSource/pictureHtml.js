@@ -302,9 +302,9 @@ function danyeHtml(imgSrc) {
 阅读调用示例:
 <js>
 let params = {
-    result: `${String(result)}`,
+    result: String(result),
     totalPage: String(java.getString("@@class.page-indicator@ownText")).replace("/",""),
-    baseUrl: `${baseUrl}`,
+    baseUrl: baseUrl,
     pageUrlTemplate: "{baseUrl}?page={page}",
     imageSelector: "figure img",
 }
