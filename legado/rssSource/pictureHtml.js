@@ -10,7 +10,7 @@ danyeHtml(result);
 */
 function danyeHtml(imgSrc) {
     if (typeof imgSrc !== 'string' || imgSrc.trim() === '') {
-        throw new Error('参数必须是非空字符串');
+        throw new Error('\n参数必须是非空字符串\n');
     }
 
     const list = imgSrc.split('\n')
@@ -18,7 +18,7 @@ function danyeHtml(imgSrc) {
         .filter(item => item !== '');
 
     if (list.length === 0) {
-        throw new Error('图片列表为空');
+        throw new Error('\n图片列表为空\n');
     }
 
     const imgArr = list.reduce((acc, url) => {
@@ -293,7 +293,7 @@ function danyeHtml(imgSrc) {
 /*
  该函数适用于原网页图片分多页加载
  params是一个对象，必须包含：
-    - result: string // 复用已经得到的第一页的请求结果
+    - html: string // 复用已经得到的第一页的请求结果,可以没有这一项，会再次请求第一页
     - totalPage: string or Number //总页数
     - baseUrl: string  //基础URL，用于拼接下一页URL
     - pageUrlTemplate: string  //下一页URL模板，必须包含{baseUrl}和{page}占位符
@@ -302,7 +302,7 @@ function danyeHtml(imgSrc) {
 阅读调用示例:
 <js>
 let params = {
-    result: String(result),
+    html: String(result),
     totalPage: String(java.getString("@@class.page-indicator@ownText")).replace("/",""),
     baseUrl: baseUrl,
     pageUrlTemplate: "{baseUrl}?page={page}",
@@ -315,27 +315,22 @@ function duoyeHtml(params) {
     // 参数校验
     if (Object.prototype.toString.call(params) !== '[object Object]') {
         throw new TypeError(
-            `params 必须是一个对象，当前值：${JSON.stringify(params)}`
+            `\nparams 必须是一个对象，当前值：${JSON.stringify(params)}\n`
         );
     }
 
     let {
-        result,
+        html = "",
         totalPage,
         baseUrl,
         pageUrlTemplate,
         imageSelector
     } = params;
 
-    // 校验 result 
-    if (typeof result !== 'string') {
+    // 校验 html 
+    if (typeof html !== 'string') {
         throw new TypeError(
-            `result 必须是 string 类型（第一页 HTML 文本），当前值：${JSON.stringify(result)}`
-        );
-    }
-    if (result.trim() === '') {
-        throw new TypeError(
-            'result 不能为空字符串（第一页 HTML 内容为空）'
+            `\nhtml 必须是 string 类型（第一页 HTML 文本），当前值：${JSON.stringify(html)}\n`
         );
     }
 
@@ -343,7 +338,7 @@ function duoyeHtml(params) {
     if (typeof totalPage === 'number') {
         if (!Number.isSafeInteger(totalPage) || totalPage <= 0) {
             throw new TypeError(
-                `params.totalPage 为 number 时，必须是大于 0 的安全整数，当前值：${JSON.stringify(totalPage)}`
+                `\nparams.totalPage 为 number 时，必须是大于 0 的安全整数，当前值：${JSON.stringify(totalPage)}\n`
             );
         }
         totalPage = String(totalPage);
@@ -351,20 +346,20 @@ function duoyeHtml(params) {
         const raw = totalPage.trim();
         if (!/^[1-9]\d*$/.test(raw)) {
             throw new TypeError(
-                `params.totalPage 为 string 时，必须是正整数字符串，如 "1"、"10"，当前值：${JSON.stringify(totalPage)}`
+                `\nparams.totalPage 为 string 时，必须是正整数字符串，如 "1"、"10"，当前值：${JSON.stringify(totalPage)}\n`
             );
         }
         totalPage = String(Number(raw));
     } else {
         throw new TypeError(
-            `params.totalPage 只允许 number 或 string 类型，当前值：${JSON.stringify(totalPage)}`
+            `\nparams.totalPage 只允许 number 或 string 类型，当前值：${JSON.stringify(totalPage)}\n`
         );
     }
 
     // 校验 baseUrl
     if (typeof baseUrl !== 'string' || baseUrl.trim() === '') {
         throw new TypeError(
-            `params.baseUrl 必须是非空字符串，当前值：${JSON.stringify(baseUrl)}`
+            `\nparams.baseUrl 必须是非空字符串，当前值：${JSON.stringify(baseUrl)}\n`
         );
     }
     baseUrl = baseUrl.trim();
@@ -372,7 +367,7 @@ function duoyeHtml(params) {
     // 校验 pageUrlTemplate
     if (typeof pageUrlTemplate !== 'string' || pageUrlTemplate.trim() === '') {
         throw new TypeError(
-            `params.pageUrlTemplate 必须是非空字符串，当前值：${JSON.stringify(pageUrlTemplate)}`
+            `\nparams.pageUrlTemplate 必须是非空字符串，当前值：${JSON.stringify(pageUrlTemplate)}\n`
         );
     }
 
@@ -381,17 +376,23 @@ function duoyeHtml(params) {
         !pageUrlTemplate.includes('{page}')
     ) {
         throw new Error(
-            `params.pageUrlTemplate 必须包含 {baseUrl} 和 {page} 占位符，当前值：${JSON.stringify(pageUrlTemplate)}`
+            `\nparams.pageUrlTemplate 必须包含 {baseUrl} 和 {page} 占位符，当前值：${JSON.stringify(pageUrlTemplate)}\n`
         );
     }
 
     // 校验 imageSelector
     if (typeof imageSelector !== 'string' || imageSelector.trim() === '') {
         throw new TypeError(
-            `params.imageSelector 必须是合法的 CSS 选择器字符串，当前值：${JSON.stringify(imageSelector)}`
+            `\nparams.imageSelector 必须是合法的 CSS 选择器字符串，当前值：${JSON.stringify(imageSelector)}\n`
         );
     }
     imageSelector = imageSelector.trim();
+
+    //处理第一页请求结果
+    const {
+        java
+    } = this;
+    const imgUrl = java.getStringList(`${imageSelector}@src`, html);
 
     return `<!DOCTYPE html>
 <html lang="zh-CN">
@@ -469,10 +470,6 @@ function duoyeHtml(params) {
 <body>
     <ul class="gallery"></ul>
     <div id="load-status"></div>
-
-    <script id="first-page-data" type="application/json">
-        ${encodeURIComponent(result)}
-    </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/viewerjs/1.10.0/viewer.min.js"></script>
     <script>
         const CONFIG = {
@@ -480,7 +477,7 @@ function duoyeHtml(params) {
             baseUrl: "${params.baseUrl}",
             pageUrlTemplate: "${params.pageUrlTemplate}",
             imageSelector: "${params.imageSelector}",
-            errorText: "加载失败",
+            errorText: "下一页加载失败",
             endText: "已加载全部内容",
             loadPages: 2,
             retry: { maxAttempts: 3, initialDelay: 1000, backoff: 2 },
@@ -501,11 +498,7 @@ function duoyeHtml(params) {
         const imageAbortControllers = new Map();
         
         // 复用第一页请求结果
-        const FIRST_PAGE_HTML = document.getElementById('first-page-data').textContent;
-        function parseImagesFromHtml(htmlText) {
-            const doc = new DOMParser().parseFromString(htmlText, 'text/html');
-            return Array.from(doc.querySelectorAll(CONFIG.imageSelector)).map(img => img.src);
-        }
+        const FIRST_PAGE_IMG = ${JSON.stringify(imgUrl)};
 
         // --- 1. Viewer.js 管理 ---
         const viewerManager = {
@@ -759,16 +752,17 @@ function duoyeHtml(params) {
         // --- 初始化 ---
         document.addEventListener('DOMContentLoaded', () => {
             viewerManager.init();
-
             try {
-                const firstPageImages = parseImagesFromHtml(decodeURIComponent(FIRST_PAGE_HTML));
-                if (firstPageImages.length > 0) {
-                    appendImagesToDOM(firstPageImages);
+                if (FIRST_PAGE_IMG.length > 0) {
+                    appendImagesToDOM(FIRST_PAGE_IMG);
+                } else {
+                    page = 1;
+                    loadMorePages();
                 }
             } catch (e) {
-                console.error('解析第一页结果失败', e);
+               page = 1;
+               loadMorePages();
             }
-
             initPagination();
         });
 
