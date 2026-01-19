@@ -77,7 +77,7 @@ function danyeHtml(imgSrc) {
                 overflow: hidden;
                 position: relative;
                 height: 0;
-                padding-top: calc(100% / (var(--aspect-ratio, 3/4)));
+                padding-top: calc(100% / (var(--aspect-ratio, 65/100)));
                 box-shadow: 0 2px 8px rgba(0,0,0,0.08);
             }
 
@@ -221,9 +221,10 @@ function danyeHtml(imgSrc) {
                 tempImg.onload = () => {
                     // 提前计算宽高比，减少布局闪烁
                     const aspectRatio = tempImg.naturalWidth / tempImg.naturalHeight;
-                    if (aspectRatio > 1) {
-                        img.parentElement.style.setProperty('--aspect-ratio', 4/3);
-                    }
+                    img.parentElement.style.setProperty('--aspect-ratio', aspectRatio);
+                    //if (aspectRatio > 1) {
+                    //    img.parentElement.style.setProperty('--aspect-ratio', 4/3);
+                    //}
 
                     img.src = src;
                     img.setAttribute('loaded', '');
@@ -450,7 +451,7 @@ function duoyeHtml(params) {
                 overflow: hidden;
                 position: relative;
                 height: 0;
-                padding-top: calc(100% / (var(--aspect-ratio, 3/4)));
+                padding-top: calc(100% / (var(--aspect-ratio, 65/100)));
                 box-shadow: 0 2px 8px rgba(0,0,0,0.08);
             }
 
@@ -643,9 +644,10 @@ function duoyeHtml(params) {
                 img.removeAttribute('loading');
                 // 提前计算宽高比，减少布局抖动
                 const aspectRatio = tempImg.naturalWidth / tempImg.naturalHeight;
-                if (aspectRatio > 1) {
-                    img.parentElement.style.setProperty('--aspect-ratio', '4 / 3');
-                }
+                img.parentElement.style.setProperty('--aspect-ratio', aspectRatio);
+                //if (aspectRatio > 1) {
+                //    img.parentElement.style.setProperty('--aspect-ratio', '4 / 3');
+                //}
                 // 异步设置src，避免阻塞主线程
                 requestAnimationFrame(() => {
                     img.src = tempImg.src;
