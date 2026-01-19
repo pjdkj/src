@@ -752,16 +752,11 @@ function duoyeHtml(params) {
         // --- 初始化 ---
         document.addEventListener('DOMContentLoaded', () => {
             viewerManager.init();
-            try {
-                if (FIRST_PAGE_IMG.length > 0) {
-                    appendImagesToDOM(FIRST_PAGE_IMG);
-                } else {
-                    page = 1;
-                    loadMorePages();
-                }
-            } catch (e) {
-               page = 1;
-               loadMorePages();
+            if (FIRST_PAGE_IMG.length > 0) {
+                appendImagesToDOM(FIRST_PAGE_IMG);
+            } else {
+                page = 1;
+                loadMorePages();
             }
             initPagination();
         });
