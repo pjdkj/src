@@ -761,8 +761,20 @@ function duoyeHtml(params) {
 
             } catch (error) {
                 console.error(error);
-                document.querySelector(CONFIG.selectors.loadStatus).innerHTML = '<span style="color:red">' + CONFIG.errorText + '</span>';
                 loadFailed = true;
+
+                const loadStatus = document.querySelector(CONFIG.selectors.loadStatus);
+                loadStatus.innerHTML = '<span id="retry-load" style="color:red; cursor:pointer; text-decoration:underline;">' + CONFIG.errorText + '，点击重试</span>';
+ 
+                const retryBtn = document.getElementById('retry-load');
+                if (retryBtn) {
+                    retryBtn.addEventListener('click', () => {
+                        loadFailed = false;
+                        loadStatus.textContent = '重新加载中...';
+                        loadMorePages();
+                    }, { once: true });
+                }
+                
             } finally {
                 isLoading = false;
             }
