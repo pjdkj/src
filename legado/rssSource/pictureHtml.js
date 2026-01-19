@@ -447,7 +447,7 @@ function duoyeHtml(params) {
             .gallery li {
                 width: 100%;
                 margin-bottom: 15px;
-                background: floralwhite;
+                background: ${background};
                 border-radius: 8px;
                 overflow: hidden;
                 position: relative;
