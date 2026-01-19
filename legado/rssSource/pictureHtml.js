@@ -30,6 +30,16 @@ function danyeHtml(imgSrc) {
 
     let imgTags = imgArr.join('\n');
 
+    //设置主题
+    const { cache } = this;
+    let background = "";
+    if (cache.get('N8RiyYuZWfvhCg==') == 'an') {
+        background = '#151924';
+    }
+    else {
+        background = 'floralwhite';
+    }
+
     return `<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -46,7 +56,7 @@ function danyeHtml(imgSrc) {
         body {
             margin: 0;
             padding: 20px 0;
-            background-color: floralwhite;
+            background-color: ${background};
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             min-height: 100vh;
         }
@@ -388,11 +398,22 @@ function duoyeHtml(params) {
     }
     imageSelector = imageSelector.trim();
 
-    //处理第一页请求结果
     const {
-        java
+        java,
+        cache
     } = this;
+
+    //处理第一页请求结果
     const imgUrl = java.getStringList(`${imageSelector}@src`, html);
+
+    //设置主题
+    let background = "";
+    if (cache.get('N8RiyYuZWfvhCg==') == 'an') {
+        background = '#151924';
+    }
+    else {
+        background = 'floralwhite';
+    }
 
     return `<!DOCTYPE html>
 <html lang="zh-CN">
@@ -410,7 +431,7 @@ function duoyeHtml(params) {
         body {
             margin: 0;
             padding: 20px 0;
-            background-color: floralwhite;
+            background-color: ${background};
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             min-height: 100vh;
         }
