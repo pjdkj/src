@@ -79,8 +79,6 @@ function danyeHtml(imgSrc) {
                 height: 0;
                 padding-top: calc(100% / (var(--aspect-ratio, 3/4)));
                 box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-                /* 预加载占位，减少闪烁 */
-                background: #f8f9fa;
             }
 
                 .gallery li.error {
