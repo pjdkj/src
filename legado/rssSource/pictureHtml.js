@@ -319,7 +319,7 @@ let config = {
 <js>
 let config = {
     html: String(result),
-    nextPageSelector: ".simple-page-nav .next",
+    nextPageSelector: '.pagelist>a:contains("下一页")',
     imageSelector: "figure img"
 }
 duoyeHtml(config)
@@ -409,7 +409,7 @@ function duoyeHtml(config) {
         })
     }
     let SECOND_PAGE_URL = html
-        ? java.getString(`${nextPageSelector}@href`, html)
+        ? java.getString(`${Json.stringify(nextPageSelector)}@href`, html)
         : '';
     if (SECOND_PAGE_URL && !/^(https?:)?\/\//.test(SECOND_PAGE_URL)) {
         if (/^\//.test(SECOND_PAGE_URL)) {
