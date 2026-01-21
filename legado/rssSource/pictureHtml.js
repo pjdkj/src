@@ -689,7 +689,11 @@ function duoyeHtml(config) {
             let nextUrl = null;
             const next = doc.querySelector(CONFIG.nextPageSelector);
             if (next?.getAttribute('href')) {
-                nextUrl = new URL(next.getAttribute('href'), baseUrl).href;
+                try{
+                    nextUrl = new URL(next.getAttribute('href'), baseUrl).href;
+                }catch(e){
+                    throw new Error('链接解析失败' + e.message);
+                }
             }
 
             return { images, nextUrl };
@@ -810,7 +814,11 @@ function duoyeHtml(config) {
 
             if (${!!html}) {
                 appendImagesToDom(${JSON.stringify(FIRST_PAGE_IMG)});
-                const nextUrl = new URL(${JSON.stringify(SECOND_PAGE_URL)}, ${JSON.stringify(host)}).href;
+                try {
+                    const nextUrl = new URL(${JSON.stringify(SECOND_PAGE_URL)}, ${JSON.stringify(host)}).href;
+                }catch(e){
+                    throw new Error('链接解析失败' + e.message);
+                }
                 if (nextUrl) pageQueue.push(nextUrl);
                 else noMorePages = true;
             } else {
