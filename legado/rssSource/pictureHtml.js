@@ -681,6 +681,26 @@ function duoyeHtml(config) {
             imageLoader.loadImagesInOrder(imgs);
         }
 
+        /* --- 解析相对链接 --- */
+        function resolveNextUrl(href, pageUrl) {
+            if (!href || typeof href !== 'string') return null;
+
+            const trimmed = href.trim();
+            if (!trimmed) return null;
+
+            // pageUrl 必须是 http(s)
+            if (!/^https?:\/\//i.test(pageUrl)) return null;
+
+            try {
+                const url = new URL(trimmed, pageUrl).href;
+                if (url === pageUrl) return null; // 防止自循环
+                return url;
+            } catch (e) {
+                console.warn('URL resolve failed:', trimmed, pageUrl);
+                return null;
+            }
+        }
+
         /* --- 页面解析 --- */
         function parsePage(htmlText, baseUrl) {
             const doc = new DOMParser().parseFromString(htmlText, 'text/html');
@@ -689,11 +709,7 @@ function duoyeHtml(config) {
             let nextUrl = null;
             const next = doc.querySelector(CONFIG.nextPageSelector);
             if (next?.getAttribute('href')) {
-                try{
-                    nextUrl = new URL(next.getAttribute('href'), baseUrl).href;
-                }catch(e){
-                    console.error('链接解析失败', e);
-                }
+                nextUrl = resolveNextUrl(next.getAttribute('href'), baseUrl);
             }
 
             return { images, nextUrl };
@@ -814,12 +830,7 @@ function duoyeHtml(config) {
 
             if (${!!html}) {
                 appendImagesToDom(${JSON.stringify(FIRST_PAGE_IMG)});
-                let nextUrl = null;
-                try {
-                    nextUrl = new URL(${JSON.stringify(SECOND_PAGE_URL)}, ${JSON.stringify(host)}).href;
-                }catch(e){
-                    console.error('链接解析失败', e);
-                }
+                let nextUrl = resolveNextUrl(${JSON.stringify(SECOND_PAGE_URL)}, ${JSON.stringify(host)});
                 if (nextUrl) pageQueue.push(nextUrl);
                 else noMorePages = true;
             } else {
