@@ -2,8 +2,8 @@
 该函数适用于原网站图片不分页的情况
 imgSrc: string      // 必须：图片的src,多张图片默认以换行符分隔
 viewer?: boolean    // 可选：查看大图插件，默认true，为false时禁用，微弱提升性能
-tag?: string        // 可选：自定义html标签，插入到页面顶部，通常用于标题等
-style?: string      // 可选：自定义标签样式，或写在阅读预留位置
+tag?: string        // 可选：自定义html标签，插入到页面顶部，通常用于标题等,例如：`<h1 style='text-align:center;'>${java.getString("h1@text")}</h1>`
+style?: string      // 可选：自定义标签样式，插入到<style></style>里，或写在阅读预留位置
 
 阅读调用示例:
 class.list-gallery@img@src
@@ -56,6 +56,9 @@ function danyeHtml(imgSrc, viewer, tag, style) {
     //设置主题
     const { cache } = this;
     let background = "";
+    
+
+ 
     if (cache.get('N8RiyYuZWfvhCg==') == 'an') {
         background = '#151924';
     }
@@ -314,8 +317,8 @@ let config = {
     viewer?: boolean,           // 可选：查看大图插件，默认true，为false时禁用，微弱提升性能
     lazy?: boolean,             // 可选：默认true，为false时直接按第一页到最后一页顺序加载全部图片
     batchSize?: number,         // 可选：lazy: true时生效，每批加载页数，默认2，页面将要划到底时加载下一批
-    tag?: string,               // 可选：自定义html标签，插入到页面顶部，通常用于标题等
-    style?: string              // 可选：自定义标签样式，或写在阅读预留位置
+    tag?: string,               // 可选：自定义html标签，插入到页面顶部，通常用于标题等，例如：`<h1 style='text-align:center;'>${java.getString("h1@text")}</h1>`
+    style?: string              // 可选：自定义标签样式，插入到<style></style>里，或写在阅读预留位置
 }
 
 阅读调用示例:
