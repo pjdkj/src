@@ -1,6 +1,9 @@
 /*
-该函数适用于原网页图片不分页的情况
-输入imgSrc(String)阅读获取的图片src,多张图片默认以换行符分隔
+该函数适用于原网站图片不分页的情况
+imgSrc: string      // 必须：图片的src,多张图片默认以换行符分隔
+viewer?: boolean    // 可选：查看大图插件，默认true，为false时禁用，微弱提升性能
+tag?: string        // 可选：自定义html标签，插入到页面顶部，通常用于标题等
+style?: string      // 可选：自定义标签样式，或写在阅读预留位置
 
 阅读调用示例:
 class.list-gallery@img@src
@@ -8,17 +11,37 @@ class.list-gallery@img@src
 danyeHtml(result);
 </js>
 */
-function danyeHtml(imgSrc) {
+function danyeHtml(imgSrc, viewer, tag, style) {
+    /* ---------- 参数校验 ---------- */
     if (typeof imgSrc !== 'string' || imgSrc.trim() === '') {
-        throw new Error('\n参数必须是非空字符串\n');
+        throw new Error('< error: imgSrc必须是非空字符串 >');
     }
+    if (viewer !== undefined && typeof viewer !== 'boolean') {
+        throw new TypeError(`< error: viewer 必须是 boolean，当前值：${JSON.stringify(viewer)} >`);
+    }
+    viewer = viewer !== false;
+
+    if (tag && typeof tag !== 'string') {
+        throw new TypeError(`< error: tag 必须是 string 类型，当前值：${JSON.stringify(tag)} >`);
+    }
+    if (tag && !/<[\S\s]*?>/.test(tag)) {
+        throw new TypeError(`< error: 没有检测到html标签<***>，当前值：${JSON.stringify(tag)} >`);
+    }
+    tag = tag || "";
+
+    if (style && typeof style !== 'string') {
+        throw new TypeError(`< error: style 必须是 string 类型，当前值：${JSON.stringify(style)} >`);
+    }
+    if (style && !/\{[\S\s]*?\}/.test(style)) {
+        throw new TypeError(`< error: 没有检测到style样式{***}，当前值：${JSON.stringify(style)} >`);
+    }
+    style = style || "";
 
     const list = imgSrc.split('\n')
         .map(item => item.trim())
         .filter(item => item !== '');
-
     if (list.length === 0) {
-        throw new Error('\n图片列表为空\n');
+        throw new Error(`< error: imgSrc 未包含任何有效图片地址,当前值：${JSON.stringify(imgSrc)} >`);
     }
 
     const imgArr = list.reduce((acc, url) => {
@@ -116,9 +139,11 @@ function danyeHtml(imgSrc) {
             font-size: 14px;
             padding: 20px 0 10px;
         }
+        ${style}
     </style>
 </head>
 <body>
+    ${tag}
     <ul class="gallery">
         ${imgTags}
     </ul>
@@ -126,27 +151,10 @@ function danyeHtml(imgSrc) {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/viewerjs/1.10.0/viewer.min.js"></script>
     <script>
         const CONFIG = {
-            retry: {
-                maxAttempts: 3,
-                initialDelay: 1000,
-                backoff: 2
-            },
-            viewer: {
-                toolbar: {
-                    zoomIn: 1,
-                    zoomOut: 1,
-                    oneToOne: 1,
-                    reset: 1
-                },
-                transition: false,
-                navbar: false,
-                title: false
-            },
-            // 并发控制配置
-            load: {
-                concurrency: 3, // 同时加载的图片数量
-                batchDelay: 300 // 批次加载延迟（ms）
-            }
+            retry: { maxAttempts: 3, initialDelay: 1000, backoff: 2 },
+            viewer: ${viewer},
+            viewerParams: { toolbar: { zoomIn: 1, zoomOut: 1, oneToOne: 1, reset: 1 }, transition: false, navbar: false, title: false },
+            load: { concurrency: 3, batchDelay: 300 }
         };
 
         // Viewer实例管理 - 优化更新频率
@@ -156,12 +164,12 @@ function danyeHtml(imgSrc) {
             init() {
                 if (this.instance) return;
                 this.instance = new Viewer(document.querySelector('.gallery'), {
-                    ...CONFIG.viewer,
+                    ...CONFIG.viewerParams,
                     url: 'data-src'
                 });
             },
-            // 防抖更新，减少DOM操作
             update() {
+                if (!this.instance) return; 
                 if (this.updateTimer) clearTimeout(this.updateTimer);
                 this.updateTimer = setTimeout(() => {
                     this.instance?.update();
@@ -181,7 +189,7 @@ function danyeHtml(imgSrc) {
             }
         };
 
-        // 图片加载控制 - 核心优化
+        // 图片加载控制
         const imageLoader = {
             loadingCount: 0, // 当前加载中的图片数
             imageQueue: [],  // 待加载图片队列
@@ -214,7 +222,6 @@ function danyeHtml(imgSrc) {
                 img.setAttribute('loading', '');
                 this.loadingCount++;
 
-                // 移除时间戳，利用浏览器缓存
                 const src = img.dataset.src;
                 const tempImg = new Image();
 
@@ -222,9 +229,6 @@ function danyeHtml(imgSrc) {
                     // 提前计算宽高比，减少布局闪烁
                     const aspectRatio = tempImg.naturalWidth / tempImg.naturalHeight;
                     img.parentElement.style.setProperty('--aspect-ratio', aspectRatio);
-                    //if (aspectRatio > 1) {
-                    //    img.parentElement.style.setProperty('--aspect-ratio', 4/3);
-                    //}
 
                     img.src = src;
                     img.setAttribute('loaded', '');
@@ -244,7 +248,7 @@ function danyeHtml(imgSrc) {
                     this.handleError(img, attempt);
                 };
 
-                // 优化：添加超时处理
+                // 超时处理
                 tempImg.timeoutId = setTimeout(() => {
                     tempImg.onerror();
                 }, 10000); // 10秒超时
@@ -252,7 +256,7 @@ function danyeHtml(imgSrc) {
                 tempImg.src = src;
             },
 
-            // 错误处理（修复重试计数）
+            // 错误处理
             handleError(img, attempt) {
                 this.loadingCount--;
 
@@ -281,7 +285,7 @@ function danyeHtml(imgSrc) {
 
         // 页面初始化
         document.addEventListener('DOMContentLoaded', () => {
-            viewerManager.init();
+            if (CONFIG.viewer) viewerManager.init();
             imageLoader.initQueue();
         });
 
@@ -300,118 +304,110 @@ function danyeHtml(imgSrc) {
 }
 
 /*
- 该函数适用于原网页图片分多页加载
- params是一个对象，必须包含：
-    - html: string // 复用已经得到的第一页的请求结果,可以没有这一项，会再次请求第一页
-    - totalPage: string or Number //总页数
-    - baseUrl: string  //基础URL，用于拼接下一页URL
-    - pageUrlTemplate: string  //下一页URL模板，必须包含{baseUrl}和{page}占位符
-    - imageSelector: string  //img标签选择器CSS，用于从页面中提取图片的img标签
+该函数适用于原网站图片分多页加载的情况，通过“下一页”链接逐页抓取图片并展示在单一页面中。
+let config = {
+    html?: string,              // 二选一：第一页 HTML（优先复用已经得到的第一页请求结果）
+    firstPageUrl?: string,      // 二选一：第一页 URL（html 不存在时必须，会再次请求）
+    host?: string,              // 可选：默认使用baseUrl解析相对路径链接，有误时手动填写
+    nextPageSelector: string,   // 必须：下一页链接的 CSS 选择器
+    imageSelector: string,      // 必须：图片CSS选择器
+    viewer?: boolean,           // 可选：查看大图插件，默认true，为false时禁用，微弱提升性能
+    lazy?: boolean,             // 可选：默认true，为false时直接按第一页到最后一页顺序加载全部图片
+    batchSize?: number,         // 可选：lazy: true时生效，每批加载页数，默认2，页面将要划到底时加载下一批
+    tag?: string,               // 可选：自定义html标签，插入到页面顶部，通常用于标题等
+    style?: string              // 可选：自定义标签样式，或写在阅读预留位置
+}
 
 阅读调用示例:
 <js>
-let params = {
+let config = {
     html: String(result),
-    totalPage: String(java.getString("@@class.page-indicator@ownText")).replace("/",""),
-    baseUrl: baseUrl,
-    pageUrlTemplate: "{baseUrl}?page={page}",
-    imageSelector: "figure img",
+    nextPageSelector: ".simple-page-nav .next",
+    imageSelector: "figure img"
 }
-duoyeHtml(params)
+duoyeHtml(config)
 </js>
  */
-function duoyeHtml(params) {
-    // 参数校验
-    if (Object.prototype.toString.call(params) !== '[object Object]') {
-        throw new TypeError(
-            `\nparams 必须是一个对象，当前值：${JSON.stringify(params)}\n`
-        );
+function duoyeHtml(config) {
+    /* ---------- 参数校验 ---------- */
+    if (Object.prototype.toString.call(config) !== '[object Object]') {
+        throw new TypeError('< error: config 必须是对象 >');
     }
 
     let {
-        html = "",
-        totalPage,
-        baseUrl,
-        pageUrlTemplate,
-        imageSelector
-    } = params;
+        html = '',
+        firstPageUrl = '',
+        host = String(this.baseUrl).replace(/(.*\/\/[^/]+)\/.*/, "$1"),
+        nextPageSelector = '',
+        imageSelector = '',
+        viewer = true,
+        lazy = true,
+        batchSize = 2,
+        tag = '',
+        style = ''
+    } = config;
 
-    // 校验 html 
-    if (typeof html !== 'string') {
-        throw new TypeError(
-            `\nhtml 必须是 string 类型（第一页 HTML 文本），当前值：${JSON.stringify(html)}\n`
-        );
+    if (html && typeof html !== 'string') {
+        throw new TypeError(`< error: html 必须是 string 类型，当前值：${JSON.stringify(html)} >`);
+    }
+    if (!html && (!firstPageUrl || typeof firstPageUrl !== 'string')) {
+        throw new TypeError(`< error: html 不存在时，必须提供 firstPageUrl，当前值：${JSON.stringify(firstPageUrl)} >`);
+    }
+    if (html && firstPageUrl && typeof firstPageUrl !== 'string') {
+        throw new TypeError(`< error: firstPageUrl 必须是 string 类型，当前值：${JSON.stringify(firstPageUrl)} >`);
+    }
+    if (host && typeof host !== 'string') {
+        throw new TypeError(`< error: host 必须是 string 类型，当前值：${JSON.stringify(host)} >`);
+    }
+    if (typeof nextPageSelector !== 'string' || !nextPageSelector.trim()) {
+        throw new TypeError(`< error: nextPageSelector 必须是非空字符串，当前值：${JSON.stringify(nextPageSelector)} >`);
+    }
+    if (typeof imageSelector !== 'string' || !imageSelector.trim()) {
+        throw new TypeError(`< error: imageSelector 必须是非空字符串，当前值：${JSON.stringify(imageSelector)} >`);
+    }
+    if (typeof viewer !== 'boolean') {
+        throw new TypeError(`< error: viewer 必须是 boolean，当前值：${JSON.stringify(viewer)} >`);
+    }
+    if (typeof lazy !== 'boolean') {
+        throw new TypeError(`< error: lazy 必须是 boolean，当前值：${JSON.stringify(lazy)} >`);
+    }
+    if (!Number.isInteger(batchSize) || batchSize <= 0) {
+        throw new TypeError(`< error: batchSize 必须是正整数，当前值：${JSON.stringify(batchSize)} >`);
+    }
+    if (tag && typeof tag !== 'string') {
+        throw new TypeError(`< error: tag 必须是 string 类型，当前值：${JSON.stringify(tag)} >`);
+    }
+    if (tag && !/<[\S\s]*?>/.test(tag)) {
+        throw new TypeError(`< error: 没有检测到html标签<***>，当前值：${JSON.stringify(tag)} >`);
+    }
+    if (style && typeof style !== 'string') {
+        throw new TypeError(`< error: style 必须是 string 类型，当前值：${JSON.stringify(style)} >`);
+    }
+    if (style && !/\{[\S\s]*?\}/.test(style)) {
+        throw new TypeError(`< error: 没有检测到style样式{***}，当前值：${JSON.stringify(style)} >`);
     }
 
-    // 校验 totalPage（支持 number / string）
-    if (typeof totalPage === 'number') {
-        if (!Number.isSafeInteger(totalPage) || totalPage <= 0) {
-            throw new TypeError(
-                `\nparams.totalPage 为 number 时，必须是大于 0 的安全整数，当前值：${JSON.stringify(totalPage)}\n`
-            );
-        }
-        totalPage = String(totalPage);
-    } else if (typeof totalPage === 'string') {
-        const raw = totalPage.trim();
-        if (!/^[1-9]\d*$/.test(raw)) {
-            throw new TypeError(
-                `\nparams.totalPage 为 string 时，必须是正整数字符串，如 "1"、"10"，当前值：${JSON.stringify(totalPage)}\n`
-            );
-        }
-        totalPage = String(Number(raw));
-    } else {
-        throw new TypeError(
-            `\nparams.totalPage 只允许 number 或 string 类型，当前值：${JSON.stringify(totalPage)}\n`
-        );
-    }
-
-    // 校验 baseUrl
-    if (typeof baseUrl !== 'string' || baseUrl.trim() === '') {
-        throw new TypeError(
-            `\nparams.baseUrl 必须是非空字符串，当前值：${JSON.stringify(baseUrl)}\n`
-        );
-    }
-    baseUrl = baseUrl.trim();
-
-    // 校验 pageUrlTemplate
-    if (typeof pageUrlTemplate !== 'string' || pageUrlTemplate.trim() === '') {
-        throw new TypeError(
-            `\nparams.pageUrlTemplate 必须是非空字符串，当前值：${JSON.stringify(pageUrlTemplate)}\n`
-        );
-    }
-
-    if (
-        !pageUrlTemplate.includes('{baseUrl}') ||
-        !pageUrlTemplate.includes('{page}')
-    ) {
-        throw new Error(
-            `\nparams.pageUrlTemplate 必须包含 {baseUrl} 和 {page} 占位符，当前值：${JSON.stringify(pageUrlTemplate)}\n`
-        );
-    }
-
-    // 校验 imageSelector
-    if (typeof imageSelector !== 'string' || imageSelector.trim() === '') {
-        throw new TypeError(
-            `\nparams.imageSelector 必须是合法的 CSS 选择器字符串，当前值：${JSON.stringify(imageSelector)}\n`
-        );
-    }
-    imageSelector = imageSelector.trim();
-
-    const {
-        java,
-        cache
-    } = this;
-
-    //处理第一页请求结果
-    const imgUrl = java.getStringList(`${imageSelector}@src`, html);
-
+    const { java, cache } = this;
     //设置主题
-    let background = "";
-    if (cache.get('N8RiyYuZWfvhCg==') == 'an') {
-        background = '#151924';
+    const background = cache.get('N8RiyYuZWfvhCg==') === 'an' ? '#151924' : 'floralwhite';
+
+    // 复用第一页 HTML
+    let FIRST_PAGE_IMG = html
+        ? java.getStringList(`${imageSelector}@src`, html)
+        : [];
+    FIRST_PAGE_IMG = JSON.parse(JSON.stringify(FIRST_PAGE_IMG));
+    if (FIRST_PAGE_IMG.length > 0) {
+        FIRST_PAGE_IMG.forEach((src, i, arr) => {
+            if (!/^(https?:)?\/\//.test(src)) {
+                arr[i] = host + src;
+            }
+        })
     }
-    else {
-        background = 'floralwhite';
+    let SECOND_PAGE_URL = html
+        ? java.getString(`${nextPageSelector}@href`, html)
+        : '';
+    if (SECOND_PAGE_URL && !/^(https?:)?\/\//.test(SECOND_PAGE_URL)) {
+        SECOND_PAGE_URL = host + SECOND_PAGE_URL;
     }
 
     return `<!DOCTYPE html>
@@ -485,61 +481,62 @@ function duoyeHtml(params) {
             padding: 15px;
             color: #666;
         }
+
+        ${style}
     </style>
 </head>
 <body>
+    ${tag}
     <ul class="gallery"></ul>
     <div id="load-status"></div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/viewerjs/1.10.0/viewer.min.js"></script>
     <script>
         const CONFIG = {
-            totalPage: ${params.totalPage},
-            baseUrl: "${params.baseUrl}",
-            pageUrlTemplate: "${params.pageUrlTemplate}",
-            imageSelector: "${params.imageSelector}",
-            errorText: "下一页加载失败",
-            endText: "已加载全部内容",
-            loadPages: 2,
-            retry: { maxAttempts: 3, initialDelay: 1000, backoff: 2 },
-            viewer: { toolbar: { zoomIn: 1, zoomOut: 1, oneToOne: 1, reset: 1 }, transition: false, navbar: false, title: false },
-            selectors: { gallery: '.gallery', loadStatus: '#load-status', sentinel: '#load-sentinel' },
-            observer: { rootMargin: '800px', threshold: 0.01 },
+            imageSelector: "${imageSelector}",
+            nextPageSelector: "${nextPageSelector}",
+            viewer: ${viewer},
+            lazy: ${lazy},
+            batchSize: ${batchSize},
             imageLoad: {
                 batchSize: 3, // 每批加载3张
                 viewportFirst: true, // 首屏图片优先加载
                 cache: true // 启用图片缓存
-            }
+            },
+            retry: { maxAttempts: 3, initialDelay: 1000, backoff: 2 },
+            viewerParams: { toolbar: { zoomIn: 1, zoomOut: 1, oneToOne: 1, reset: 1 }, transition: false, navbar: false, title: false },
+            observer: { rootMargin: '800px', threshold: 0.01 }
         };
 
-        let page = 2;
         let isLoading = false;
         let loadFailed = false;
+        let noMorePages = false;
         let pageObserver = null;
-        const imageAbortControllers = new Map();
-        
-        // 复用第一页请求结果
-        const FIRST_PAGE_IMG = ${JSON.stringify(imgUrl)};
+        let pendingPageResolve = null;
 
-        // --- 1. Viewer.js 管理 ---
+        const pageQueue = [];
+        const visitedPages = new Set();
+        const imageAbortControllers = new Map();
+
+        /* --- Viewer 管理 --- */
         const viewerManager = {
             instance: null,
-            updateTimer: null,
+            timer: null,
             init() {
                 if (this.instance) return;
-                this.instance = new Viewer(document.querySelector(CONFIG.selectors.gallery), {
-                    ...CONFIG.viewer,
+                this.instance = new Viewer(document.querySelector('.gallery'), {
+                    ...CONFIG.viewerParams,
                     url: 'data-src'
                 });
             },
-            // 防抖更新Viewer，减少重绘
             update() {
-                clearTimeout(this.updateTimer);
-                this.updateTimer = setTimeout(() => {
+                if (!this.instance) return;
+                clearTimeout(this.timer);
+                this.timer = setTimeout(() => {
                     this.instance?.update();
                 }, 100);
             },
             destroy() {
-                clearTimeout(this.updateTimer);
+                clearTimeout(this.timer);
                 this.instance?.destroy();
                 // 中断所有未完成的图片请求
                 imageAbortControllers.forEach(controller => controller.abort());
@@ -547,7 +544,7 @@ function duoyeHtml(params) {
             }
         };
 
-        // --- 2. 图片加载逻辑 ---
+        /* --- 图片加载器 --- */
         const imageLoader = {
             // 异步串行分批加载图片
             async loadImagesInOrder(imgs) {
@@ -619,8 +616,8 @@ function duoyeHtml(params) {
                     tempImg.signal = signal;
 
                     tempImg.onload = () => {
-                        this.handleSuccess(img, tempImg);
                         imageAbortControllers.delete(img);
+                        this.handleSuccess(img, tempImg);
                         resolve();
                     };
 
@@ -645,9 +642,6 @@ function duoyeHtml(params) {
                 // 提前计算宽高比，减少布局抖动
                 const aspectRatio = tempImg.naturalWidth / tempImg.naturalHeight;
                 img.parentElement.style.setProperty('--aspect-ratio', aspectRatio);
-                //if (aspectRatio > 1) {
-                //    img.parentElement.style.setProperty('--aspect-ratio', '4 / 3');
-                //}
                 // 异步设置src，避免阻塞主线程
                 requestAnimationFrame(() => {
                     img.src = tempImg.src;
@@ -679,121 +673,175 @@ function duoyeHtml(params) {
             }
         };
 
-        // --- 3. 页面级无限滚动触发 ---
-        function initPagination() {
-            const sentinel = document.createElement('div');
-            sentinel.id = CONFIG.selectors.sentinel.slice(1);
-            document.querySelector(CONFIG.selectors.gallery).after(sentinel);
+        /* --- DOM 插入 --- */
+        function appendImagesToDom(urls) {
+            const gallery = document.querySelector('.gallery');
+            const frag = document.createDocumentFragment();
+            const imgs = [];
 
-            pageObserver = new IntersectionObserver(entries => {
-                if (entries[0].isIntersecting && !isLoading && !loadFailed) {
-                    loadMorePages();
-                }
-            }, CONFIG.observer);
-            pageObserver.observe(sentinel);
-        }
-
-        // --- 4. 页面数据请求 ---
-        async function fetchPage(p) {
-            try {
-                const url = CONFIG.pageUrlTemplate.replace("{baseUrl}", CONFIG.baseUrl).replace("{page}", p);
-                const response = await fetch(url);
-                if (!response.ok) throw new Error('HTTP error! status: ' + response.status);
-                const text = await response.text();
-                const doc = new DOMParser().parseFromString(text, 'text/html');
-                return Array.from(doc.querySelectorAll(CONFIG.imageSelector)).map(img => img.src);
-            } catch (error) {
-                throw new Error('第' + p + '页加载失败: ' + error.message);
-            }
-        }
-
-        // --- 5. 图片DOM插入 + 优化加载 ---
-        function appendImagesToDOM(imageUrls) {
-            const fragment = document.createDocumentFragment();
-            const gallery = document.querySelector(CONFIG.selectors.gallery);
-            const newImgs = [];
-
-            imageUrls.forEach(src => {
+            urls.forEach(src => {
                 const li = document.createElement('li');
                 const img = document.createElement('img');
                 img.dataset.src = src;
-                img.alt = '写真';
                 li.appendChild(img);
-                fragment.appendChild(li);
-                newImgs.push(img);
+                frag.appendChild(li);
+                imgs.push(img);
             });
 
-            gallery.appendChild(fragment);
-            // 启动顺序加载
-            imageLoader.loadImagesInOrder(newImgs);
-            viewerManager.update();
+            gallery.appendChild(frag);
+            imageLoader.loadImagesInOrder(imgs);
         }
 
-        // --- 6. 加载下一页数据 ---
-        async function loadMorePages() {
-            if (page > CONFIG.totalPage) {
-                document.querySelector(CONFIG.selectors.loadStatus).textContent = CONFIG.endText;
-                pageObserver?.disconnect();
-                return;
+        /* --- 页面解析 --- */
+        function parsePage(htmlText, baseUrl) {
+            const doc = new DOMParser().parseFromString(htmlText, 'text/html');
+            const images = [...doc.querySelectorAll(CONFIG.imageSelector)].map(i => i.src);
+
+            let nextUrl = null;
+            const next = doc.querySelector(CONFIG.nextPageSelector);
+            if (next?.getAttribute('href')) {
+                nextUrl = new URL(next.getAttribute('href'), baseUrl).href;
             }
 
+            return { images, nextUrl };
+        }
+
+        /* --- 页面入队通知 --- */
+        function notifyPageEnqueued() {
+            if (pendingPageResolve) {
+                pendingPageResolve();
+                pendingPageResolve = null;
+            }
+        }
+
+        /* --- 页面请求 --- */
+        async function fetchPage(url) {
+            if (visitedPages.has(url)) return null;
+            try {
+                const res = await fetch(url);
+                if (!res.ok) throw new Error('HTTP error! status: ' + res.status);
+                visitedPages.add(url);
+                return res.text();
+            } catch (e) {
+                throw new Error('页面加载失败: ' + e.message);
+            }
+        }
+
+        /* --- 单页加载 --- */
+        async function loadSinglePage() {
+            const url = pageQueue.shift();
+            if (!url) return;
+
+            const html = await fetchPage(url);
+            if (!html) return;
+
+            const { images, nextUrl } = parsePage(html, url);
+            appendImagesToDom(images);
+            if (nextUrl && !visitedPages.has(nextUrl)) {
+                pageQueue.push(nextUrl);
+                notifyPageEnqueued();
+            } else {
+                noMorePages = true;
+            }
+        }
+
+        /* --- 调度器 --- */
+        async function consumePages() {
+            if (isLoading || loadFailed) return;
             isLoading = true;
-            document.querySelector(CONFIG.selectors.loadStatus).textContent = '加载中...';
 
             try {
-                const promises = [];
-                for (let i = 0; i < CONFIG.loadPages && (page + i) <= CONFIG.totalPage; i++) {
-                    promises.push(fetchPage(page + i));
+                let count = 0;
+                while (!noMorePages || pageQueue.length > 0) {
+                    // 队列暂时为空，等待 loadSinglePage 解析出 nextUrl
+                    if (pageQueue.length === 0) {
+                        await new Promise(resolve => {
+                            if (!pendingPageResolve) {
+                                pendingPageResolve = () => {
+                                    resolve();
+                                    pendingPageResolve = null;
+                                };
+                            }
+                        });
+                        continue;
+                    }
+
+                    await loadSinglePage();
+                    count++;
+
+                    // lazy 模式：达到批次上限就暂停，等待下一次触发
+                    if (CONFIG.lazy && count >= CONFIG.batchSize) {
+                        break;
+                    }
                 }
-
-                const results = await Promise.all(promises);
-                const allNewImages = results.flat();
-
-                if (allNewImages.length > 0) {
-                    appendImagesToDOM(allNewImages);
-                    page += CONFIG.loadPages;
-                } else {
-                    throw new Error("未获取到新图片");
-                }
-
-                if (page > CONFIG.totalPage) {
-                    document.querySelector(CONFIG.selectors.loadStatus).textContent = CONFIG.endText;
+                // 更新加载状态
+                if (noMorePages && pageQueue.length === 0) {
+                    document.getElementById('load-status').textContent = '已加载全部图片';
                     pageObserver?.disconnect();
+                } else {
+                    document.getElementById('load-status').textContent = '加载中...';
                 }
-
-            } catch (error) {
-                console.error(error);
+            } catch (e) {
+                console.error(e);
                 loadFailed = true;
 
-                const loadStatus = document.querySelector(CONFIG.selectors.loadStatus);
-                loadStatus.innerHTML = '<span id="retry-load" style="color:red; cursor:pointer; text-decoration:underline;">' + CONFIG.errorText + '，点击重试</span>';
- 
-                const retryBtn = document.getElementById('retry-load');
-                if (retryBtn) {
-                    retryBtn.addEventListener('click', () => {
-                        loadFailed = false;
-                        loadStatus.textContent = '重新加载中...';
-                        loadMorePages();
-                    }, { once: true });
+                if (pendingPageResolve) {
+                    pendingPageResolve();
+                    pendingPageResolve = null;
                 }
-                
+
+                const loadStatus = document.querySelector('#load-status');
+                if (loadStatus) {
+                    loadStatus.innerHTML = '<span id="retry-load" style="color:red; cursor:pointer; text-decoration:underline;">加载失败，点击重试</span>';
+                    const retryBtn = document.getElementById('retry-load');
+                    if (retryBtn) {
+                        retryBtn.addEventListener('click', () => {
+                            loadFailed = false;
+                            noMorePages = pageQueue.length === 0 ? false : noMorePages;
+
+                            if (pendingPageResolve) {
+                                pendingPageResolve();
+                                pendingPageResolve = null;
+                            }
+
+                            loadStatus.textContent = '重新加载中...';
+                            consumePages();
+                        }, { once: true });
+                    }
+                }
+
             } finally {
                 isLoading = false;
             }
         }
 
-        // --- 初始化 ---
-        document.addEventListener('DOMContentLoaded', () => {
-            viewerManager.init();
-            if (FIRST_PAGE_IMG.length > 0) {
-                appendImagesToDOM(FIRST_PAGE_IMG);
-            } else {
-                page = 1;
-                loadMorePages();
-            }
-            initPagination();
-        });
+        /* --- 初始化 --- */
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (CONFIG.viewer) viewerManager.init();
 
+            if (${!!html}) {
+                appendImagesToDom(${JSON.stringify(FIRST_PAGE_IMG)});
+                const nextUrl = ${JSON.stringify(SECOND_PAGE_URL)};
+                if (nextUrl) pageQueue.push(nextUrl);
+                else noMorePages = true;
+            } else {
+                pageQueue.push("${firstPageUrl}");
+            }
+
+            if (CONFIG.lazy) {
+                const sentinel = document.createElement('div');
+                document.body.appendChild(sentinel);
+
+                pageObserver = new IntersectionObserver(
+                    e => e[0].isIntersecting && consumePages(),
+                    CONFIG.observer
+                );
+                pageObserver.observe(sentinel);
+            }
+
+            consumePages();
+            
+        });
         window.addEventListener('resize', () => viewerManager.update());
         window.addEventListener('beforeunload', () => viewerManager.destroy());
     </script>
