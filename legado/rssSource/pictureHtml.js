@@ -319,7 +319,7 @@ let config = {
 <js>
 let config = {
     html: String(result),
-    nextPageSelector: '.pagelist>a:contains("下一页")',
+    nextPageSelector: '.pagelist>a:contains(下一页)',
     imageSelector: "figure img"
 }
 duoyeHtml(config)
@@ -814,8 +814,9 @@ function duoyeHtml(config) {
 
             if (${!!html}) {
                 appendImagesToDom(${JSON.stringify(FIRST_PAGE_IMG)});
+                let nextUrl = null;
                 try {
-                    const nextUrl = new URL(${JSON.stringify(SECOND_PAGE_URL)}, ${JSON.stringify(host)}).href;
+                    nextUrl = new URL(${JSON.stringify(SECOND_PAGE_URL)}, ${JSON.stringify(host)}).href;
                 }catch(e){
                     throw new Error('链接解析失败' + e.message);
                 }
