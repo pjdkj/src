@@ -698,7 +698,7 @@ function duoyeHtml(config) {
             const next = doc.querySelector(CONFIG.nextPageSelector);
             if (next?.getAttribute('href')) {
                 nextUrl = new URL(next.getAttribute('href'), baseUrl).href;
-                if (!/^https?:\/\//.test(nextUrl)) {
+                if (!/^https?/.test(nextUrl)) {
                     nextUrl = null;
                 }
             }
