@@ -55,16 +55,10 @@ function danyeHtml(imgSrc, viewer, tag, style) {
 
     //设置主题
     const { cache } = this;
-    let background = "";
-    
-
- 
-    if (cache.get('N8RiyYuZWfvhCg==') == 'an') {
-        background = '#151924';
-    }
-    else {
-        background = 'floralwhite';
-    }
+    let background = cache.get("_BACK_GROUND_COLOR_") || "floralwhite";
+    let width = cache.get("_PICTURE_MARGIN_LEFT_RIGHT_") || 95;
+    let marginBottom = cache.get("_PICTURE_MARGIN_TOP_BOTTOM_") || 10;
+    let borderRadius = cache.get("_PICTURE_BORDER_RADIUS_") || 10;
 
     return `<!DOCTYPE html>
 <html lang="zh-CN">
@@ -75,7 +69,7 @@ function danyeHtml(imgSrc, viewer, tag, style) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/viewerjs/1.10.0/viewer.min.css">
     <style>
         :root {
-            --item-width: 97vw;
+            --item-width: ${width}vw;
             --aspect-ratio: 65/100;
         }
 
@@ -91,15 +85,15 @@ function danyeHtml(imgSrc, viewer, tag, style) {
             list-style: none;
             padding: 0;
             margin: 0 auto;
-            width: calc(var(--item-width) - 30px);
+            width: var(--item-width);
             max-width: 400px;
         }
 
             .gallery li {
                 width: 100%;
-                margin-bottom: 15px;
+                margin-bottom: ${marginBottom}px;
                 background: ${background};
-                border-radius: 8px;
+                border-radius: ${borderRadius}px;
                 overflow: hidden;
                 position: relative;
                 height: 0;
@@ -392,7 +386,10 @@ function duoyeHtml(config) {
 
     const { java, cache } = this;
     //设置主题
-    const background = cache.get('N8RiyYuZWfvhCg==') === 'an' ? '#151924' : 'floralwhite';
+    let background = cache.get("_BACK_GROUND_COLOR_") || "floralwhite";
+    let width = cache.get("_PICTURE_MARGIN_LEFT_RIGHT_") || 95;
+    let marginBottom = cache.get("_PICTURE_MARGIN_TOP_BOTTOM_") || 10;
+    let borderRadius = cache.get("_PICTURE_BORDER_RADIUS_") || 10;
 
     // 复用第一页 HTML
     let FIRST_PAGE_IMG = html
@@ -422,7 +419,7 @@ function duoyeHtml(config) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/viewerjs/1.10.0/viewer.min.css">
     <style>
         :root {
-            --item-width: 97vw;
+            --item-width: ${width}vw;
             --aspect-ratio: 65/100;
         }
 
@@ -438,15 +435,15 @@ function duoyeHtml(config) {
             list-style: none;
             padding: 0;
             margin: 0 auto;
-            width: calc(var(--item-width) - 30px);
+            width: var(--item-width);
             max-width: 400px;
         }
 
             .gallery li {
                 width: 100%;
-                margin-bottom: 15px;
+                margin-bottom: ${marginBottom}px;
                 background: ${background};
-                border-radius: 8px;
+                border-radius: ${borderRadius}px;
                 overflow: hidden;
                 position: relative;
                 height: 0;
