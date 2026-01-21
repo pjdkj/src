@@ -816,7 +816,7 @@ function duoyeHtml(config) {
                 appendImagesToDom(${JSON.stringify(FIRST_PAGE_IMG)});
                 let nextUrl = null;
                 try {
-                    nextUrl = new URL(${SECOND_PAGE_URL}, ${host}).href;
+                    nextUrl = new URL("${SECOND_PAGE_URL}", "${host}").href;
                 }catch(e){
                     throw new Error('链接解析失败' + e.message);
                 }
