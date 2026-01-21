@@ -393,10 +393,10 @@ function duoyeHtml(config) {
 
     // 复用第一页 HTML
     let FIRST_PAGE_IMG = html
-        ? java.getStringList(JSON.stringify(nextPageSelector) + '@src', html)
+        ? java.getStringList(`${nextPageSelector}@src`, html)
         : [];
     let SECOND_PAGE_URL = html
-        ? java.getString(JSON.stringify(nextPageSelector) + '@href', html)
+        ? java.getString(`${nextPageSelector}@href`, html)
         : '';
 
     return `<!DOCTYPE html>
