@@ -334,7 +334,7 @@ function duoyeHtml(config) {
     let {
         html = '',
         firstPageUrl = '',
-        host = String(this.baseUrl),
+        host = String(this.baseUrl).replace(/(.*\/\/[^/]+)\/.*/, "$1"),
         nextPageSelector = '',
         imageSelector = '',
         viewer = true,
@@ -398,6 +398,14 @@ function duoyeHtml(config) {
     let SECOND_PAGE_URL = html
         ? java.getString(`${nextPageSelector}@href`, html)
         : '';
+    if (SECOND_PAGE_URL && !/^https?:\/\//.test(SECOND_PAGE_URL)) {
+        if (/^\//.test(SECOND_PAGE_URL)) {
+            SECOND_PAGE_URL = host + SECOND_PAGE_URL;
+        }
+        else {
+            SECOND_PAGE_URL = host + '/' + SECOND_PAGE_URL;
+        }
+    }
 
     return `<!DOCTYPE html>
 <html lang="zh-CN">
@@ -681,26 +689,6 @@ function duoyeHtml(config) {
             imageLoader.loadImagesInOrder(imgs);
         }
 
-        /* --- 解析相对链接 --- */
-        function resolveNextUrl(href, pageUrl) {
-            if (!href || typeof href !== 'string') return null;
-
-            const trimmed = href.trim();
-            if (!trimmed) return null;
-
-            // pageUrl 必须是 http(s)
-            if (!/^https?:\/\//i.test(pageUrl)) return null;
-
-            try {
-                const url = new URL(trimmed, pageUrl).href;
-                if (url === pageUrl) return null; // 防止自循环
-                return url;
-            } catch (e) {
-                console.warn('URL resolve failed:', trimmed, pageUrl);
-                return null;
-            }
-        }
-
         /* --- 页面解析 --- */
         function parsePage(htmlText, baseUrl) {
             const doc = new DOMParser().parseFromString(htmlText, 'text/html');
@@ -709,7 +697,7 @@ function duoyeHtml(config) {
             let nextUrl = null;
             const next = doc.querySelector(CONFIG.nextPageSelector);
             if (next?.getAttribute('href')) {
-                nextUrl = resolveNextUrl(next.getAttribute('href'), baseUrl);
+                nextUrl = new URL(next.getAttribute('href'), baseUrl).href;
             }
 
             return { images, nextUrl };
@@ -830,7 +818,7 @@ function duoyeHtml(config) {
 
             if (${!!html}) {
                 appendImagesToDom(${JSON.stringify(FIRST_PAGE_IMG)});
-                let nextUrl = resolveNextUrl(${JSON.stringify(SECOND_PAGE_URL)}, ${JSON.stringify(host)});
+                let nextUrl = ${JSON.stringify(SECOND_PAGE_URL)};
                 if (nextUrl) pageQueue.push(nextUrl);
                 else noMorePages = true;
             } else {
