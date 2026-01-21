@@ -334,7 +334,7 @@ function duoyeHtml(config) {
     let {
         html = '',
         firstPageUrl = '',
-        host = String(this.baseUrl).replace(/(.*\/\/[^/]+)\/.*/, "$1"),
+        host = this.baseUrl,
         nextPageSelector = '',
         imageSelector = '',
         viewer = true,
@@ -393,32 +393,11 @@ function duoyeHtml(config) {
 
     // 复用第一页 HTML
     let FIRST_PAGE_IMG = html
-        ? java.getStringList(`${imageSelector}@src`, html)
+        ? java.getStringList(JSON.stringify(nextPageSelector) + '@src', html)
         : [];
-    FIRST_PAGE_IMG = JSON.parse(JSON.stringify(FIRST_PAGE_IMG));
-    if (FIRST_PAGE_IMG.length > 0) {
-        FIRST_PAGE_IMG.forEach((src, i, arr) => {
-            if (!/^(https?:)?\/\//.test(src)) {
-                if (/^\//.test(src)) {
-                    arr[i] = host + src;
-                }
-                else {
-                    arr[i] = host + "/" + src;
-                }
-            }
-        })
-    }
     let SECOND_PAGE_URL = html
         ? java.getString(JSON.stringify(nextPageSelector) + '@href', html)
         : '';
-    if (SECOND_PAGE_URL && !/^(https?:)?\/\//.test(SECOND_PAGE_URL)) {
-        if (/^\//.test(SECOND_PAGE_URL)) {
-            SECOND_PAGE_URL = host + SECOND_PAGE_URL;
-        }
-        else {
-            SECOND_PAGE_URL = host + "/" + SECOND_PAGE_URL;
-        }
-    }
 
     return `<!DOCTYPE html>
 <html lang="zh-CN">
@@ -831,7 +810,7 @@ function duoyeHtml(config) {
 
             if (${!!html}) {
                 appendImagesToDom(${JSON.stringify(FIRST_PAGE_IMG)});
-                const nextUrl = ${JSON.stringify(SECOND_PAGE_URL)};
+                const nextUrl = new URL(${JSON.stringify(SECOND_PAGE_URL)}, ${JSON.stringify(host)}).href;
                 if (nextUrl) pageQueue.push(nextUrl);
                 else noMorePages = true;
             } else {
