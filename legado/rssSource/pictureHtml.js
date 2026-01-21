@@ -396,7 +396,7 @@ function duoyeHtml(config) {
         ? java.getStringList(`${imageSelector}@src`, html)
         : [];
     let SECOND_PAGE_URL = html
-        ? java.getString(`${nextPageSelector}@href`, html)
+        ? String(java.getString(`${nextPageSelector}@href`, html))
         : '';
     if (SECOND_PAGE_URL && !/^https?:\/\//.test(SECOND_PAGE_URL)) {
         if (/^\//.test(SECOND_PAGE_URL)) {
