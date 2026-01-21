@@ -692,7 +692,7 @@ function duoyeHtml(config) {
                 try{
                     nextUrl = new URL(next.getAttribute('href'), baseUrl).href;
                 }catch(e){
-                    throw new Error('链接解析失败' + e.message);
+                    console.error('链接解析失败', e);
                 }
             }
 
@@ -818,7 +818,7 @@ function duoyeHtml(config) {
                 try {
                     nextUrl = new URL(${JSON.stringify(SECOND_PAGE_URL)}, ${JSON.stringify(host)}).href;
                 }catch(e){
-                    throw new Error('链接解析失败' + e.message);
+                    console.error('链接解析失败', e);
                 }
                 if (nextUrl) pageQueue.push(nextUrl);
                 else noMorePages = true;
