@@ -75,7 +75,7 @@ function danyeHtml(imgSrc, viewer, tag, style) {
 
         body {
             margin: 0;
-            padding: 20px 0;
+            padding: 10px 0;
             background-color: ${background};
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             min-height: 100vh;
@@ -425,7 +425,7 @@ function duoyeHtml(config) {
 
         body {
             margin: 0;
-            padding: 20px 0;
+            padding: 10px 0;
             background-color: ${background};
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             min-height: 100vh;
