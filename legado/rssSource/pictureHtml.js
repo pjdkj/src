@@ -502,8 +502,8 @@ function duoyeHtml(config) {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/viewerjs/1.10.0/viewer.min.js"></script>
     <script>
         const CONFIG = {
-            imageSelector: "${imageSelector}",
-            nextPageSelector: "${nextPageSelector}",
+            imageSelector: ${JSON.stringify(imageSelector)},
+            nextPageSelector: ${JSON.stringify(nextPageSelector)},
             viewer: ${viewer},
             lazy: ${lazy},
             batchSize: ${batchSize},
@@ -835,7 +835,7 @@ function duoyeHtml(config) {
                 if (nextUrl) pageQueue.push(nextUrl);
                 else noMorePages = true;
             } else {
-                pageQueue.push("${firstPageUrl}");
+                pageQueue.push(${JSON.stringify(firstPageUrl)});
             }
 
             if (CONFIG.lazy) {
