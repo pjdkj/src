@@ -409,7 +409,7 @@ function duoyeHtml(config) {
         })
     }
     let SECOND_PAGE_URL = html
-        ? java.getString(`${JSON.stringify(nextPageSelector)}@href`, html)
+        ? java.getString(JSON.stringify(nextPageSelector) + '@href', html)
         : '';
     if (SECOND_PAGE_URL && !/^(https?:)?\/\//.test(SECOND_PAGE_URL)) {
         if (/^\//.test(SECOND_PAGE_URL)) {
