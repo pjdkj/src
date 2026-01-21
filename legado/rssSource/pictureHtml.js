@@ -399,7 +399,12 @@ function duoyeHtml(config) {
     if (FIRST_PAGE_IMG.length > 0) {
         FIRST_PAGE_IMG.forEach((src, i, arr) => {
             if (!/^(https?:)?\/\//.test(src)) {
-                arr[i] = host + src;
+                if (/^\//.test(src)) {
+                    arr[i] = host + src;
+                }
+                else {
+                    arr[i] = host + "/" + src;
+                }
             }
         })
     }
@@ -407,7 +412,12 @@ function duoyeHtml(config) {
         ? java.getString(`${nextPageSelector}@href`, html)
         : '';
     if (SECOND_PAGE_URL && !/^(https?:)?\/\//.test(SECOND_PAGE_URL)) {
-        SECOND_PAGE_URL = host + SECOND_PAGE_URL;
+        if (/^\//.test(SECOND_PAGE_URL)) {
+            SECOND_PAGE_URL = host + SECOND_PAGE_URL;
+        }
+        else {
+            SECOND_PAGE_URL = host + "/" + SECOND_PAGE_URL;
+        }
     }
 
     return `<!DOCTYPE html>
