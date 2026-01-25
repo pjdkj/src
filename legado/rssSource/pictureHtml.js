@@ -63,8 +63,8 @@ function duoyeHtml(config) {
     if (host && typeof host !== 'string') {
         throw new TypeError(`< error: host 必须是 string 类型，当前值：${JSON.stringify(host)} >`);
     }
-    if (typeof nextPageSelector !== 'string' || !nextPageSelector.trim()) {
-        throw new TypeError(`< error: nextPageSelector 必须是非空字符串，当前值：${JSON.stringify(nextPageSelector)} >`);
+    if (!nextPageUrls && (typeof nextPageSelector !== 'string' || !nextPageSelector.trim())) {
+        throw new TypeError(`< error: 未提供nextPageUrls时，nextPageSelector 必须是非空字符串，当前值：${JSON.stringify(nextPageSelector)} >`);
     }
     if (typeof imageSelector !== 'string' || !imageSelector.trim()) {
         throw new TypeError(`< error: imageSelector 必须是非空字符串，当前值：${JSON.stringify(imageSelector)} >`);
