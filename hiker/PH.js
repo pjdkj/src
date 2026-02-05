@@ -99,7 +99,7 @@ function homePage() {
         try {
             layouts.push({
                 title: pdfh(li, '.title&&Text'),
-                img: pdfh(li, 'img&&data-path') + '@headers = { "Referer": "https://cn.pornhub.com/"}',
+                img: pdfh(li, 'img&&data-path') + '@headers={"Referer":"https://cn.pornhub.com/"}',
                 desc: pdfh(li, '.views&&Text'),
                 url: 'https://cn.pornhub.com' + pdfh(li, '.title&&a&&href') + privacyMode,
                 col_type: layout_style
@@ -238,7 +238,7 @@ function searchVideo(key, page) {
         try {
             layouts.push({
                 title: pdfh(li, '.title&&Text'),
-                img: pdfh(li, 'img&&data-path'),
+                img: pdfh(li, 'img&&data-path') + '@headers={"Referer":"https://cn.pornhub.com/"}',
                 desc: pdfh(li, '.videoViews&&Text') + '次观看',
                 url: 'https://cn.pornhub.com' + pdfh(li, '.title&&a&&href') + privacyMode,
                 col_type: layout_style,
@@ -273,7 +273,7 @@ function getStars(page) {
         layouts.push({
             title: pdfh(li, '.title&&Text'),
             desc: '0',
-            img: pdfh(li, 'img&&data-thumb_url'),
+            img: pdfh(li, 'img&&data-thumb_url') + '@headers={"Referer":"https://cn.pornhub.com/"}',
             url: $('hiker://empty/star?page=fypage&_t=0' + privacyMode + '#immersiveTheme#').rule((getStarDetails, link) => {
                 addListener('onClose', $.toString(() => {
                     setItem('starDetailParam', '');
@@ -300,7 +300,7 @@ function getStarDetails(link, page) {
         layouts.push({
             title: '‘‘’’' + big(pdfh(res, '.avatarWrapper&&img&&alt')),
             desc: pdfh(res, '.mobileRanksButton&&Text'),
-            img: pdfh(res, '.avatarWrapper&&img&&src'),
+            img: pdfh(res, '.avatarWrapper&&img&&src') + '@headers={"Referer":"https://cn.pornhub.com/"}',
             col_type: 'movie_1_vertical_pic_blur',
             extra: { gradient: true },
         });
@@ -343,7 +343,7 @@ function getStarDetails(link, page) {
         try {
             layouts.push({
                 title: pdfh(li, '.title&&Text'),
-                img: pdfh(li, 'img&&data-path'),
+                img: pdfh(li, 'img&&data-path') + '@headers={"Referer":"https://cn.pornhub.com/"}',
                 desc: pdfh(li, '.views&&Text'),
                 url: 'https://cn.pornhub.com' + pdfh(li, '.title&&a&&href') + privacyMode,
                 col_type: layout_style,
@@ -367,7 +367,7 @@ function getCategory() {
         layouts.push({
             title: pdfh(li, 'a&&alt'),
             desc: pdfh(li, '.videoCount&&Text'),
-            img: pdfh(li, 'img&&src'),
+            img: pdfh(li, 'img&&src') + '@headers={"Referer":"https://cn.pornhub.com/"}',
             url: $('hiker://empty/categories?page=fypage&_t=0' + privacyMode).rule((getCategoryDetails, link) => {
                 addListener('onClose', $.toString(() => { setItem('categoryParam', ''); }));
                 setResult(getCategoryDetails(link, getParam('page')));
@@ -426,7 +426,7 @@ function getCategoryDetails(link, page) {
         try {
             layouts.push({
                 title: pdfh(li, '.title&&Text'),
-                img: pdfh(li, 'img&&data-path'),
+                img: pdfh(li, 'img&&data-path') + '@headers={"Referer":"https://cn.pornhub.com/"}',
                 desc: pdfh(li, '.views&&Text'),
                 url: 'https://cn.pornhub.com' + pdfh(li, '.title&&a&&href') + privacyMode,
                 col_type: layout_style,
