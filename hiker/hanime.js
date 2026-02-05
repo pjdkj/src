@@ -62,7 +62,7 @@ function homePage() {
         "他们在看": "他們在看"
     }
     layouts.push({
-        title: getItem('sort', '默认') == '' ? '排序': getItem('sort', '默认'),
+        title: getItem('sort', '默认') == '' ? '排序' : getItem('sort', '默认'),
         url: $(sort, 1, '排序').select(() => {
             setItem('sort', input);
             setItem('p', '1');
@@ -120,51 +120,51 @@ function homePage() {
     //        });
     //    } catch (e) { }
     //});
-    if (jx1 != '主页') {
-        layouts.push(
-            {
-                col_type: 'blank_block',
-            },
-            {
-                title: '上一页',
-                url: $('').lazyRule(() => {
-                    let p = Number(getItem('p', '1'));
-                    if (p > 1) {
-                        p = p - 1;
-                        setItem('p', p.toString());
-                    }
-                    refreshPage();
-                    return 'hiker://empty';
-                }),
-                col_type: 'text_3',
-            },
-            {
-                title: '自选页',
-                url: $('', '页数').input(() => {
-                    let p = parseInt(input.trim());
-                    if (!isNaN(p)) {
-                        setItem('p', p.toString());
-                        refreshPage();
-                        return 'hiker://empty';
-                    } else {
-                        return 'toast://请输入数字';
-                    }
-                }),
-                col_type: 'text_3',
-            },
-            {
-                title: '下一页',
-                url: $('').lazyRule(() => {
-                    let p = Number(getItem('p', '1'));
-                    p = p + 1;
+
+    layouts.push(
+        {
+            col_type: 'blank_block',
+        },
+        {
+            title: '上一页',
+            url: $('').lazyRule(() => {
+                let p = Number(getItem('p', '1'));
+                if (p > 1) {
+                    p = p - 1;
+                    setItem('p', p.toString());
+                }
+                refreshPage();
+                return 'hiker://empty';
+            }),
+            col_type: 'text_3',
+        },
+        {
+            title: '自选页',
+            url: $('', '页数').input(() => {
+                let p = parseInt(input.trim());
+                if (!isNaN(p)) {
                     setItem('p', p.toString());
                     refreshPage();
                     return 'hiker://empty';
-                }),
-                col_type: 'text_3',
-            }
-        );
-    }
+                } else {
+                    return 'toast://请输入数字';
+                }
+            }),
+            col_type: 'text_3',
+        },
+        {
+            title: '下一页',
+            url: $('').lazyRule(() => {
+                let p = Number(getItem('p', '1'));
+                p = p + 1;
+                setItem('p', p.toString());
+                refreshPage();
+                return 'hiker://empty';
+            }),
+            col_type: 'text_3',
+        }
+    );
+
     setResult(layouts);
 }
 function searchVideo(key, page) {
