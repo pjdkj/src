@@ -41,12 +41,12 @@ function homePage() {
             setItem('p', '1');
             refreshPage(false);
         }),
-        col_type: 'flex_button'
+        col_type: 'text_5'
     });
     layouts.push({
         title: '标签',
         url: 'https://cn.pornhub.com/shorties' + privacyMode,
-        col_type: 'flex_button'
+        col_type: 'text_5'
     });
     let sort = ["默认", "最新上市", "最新上传", "本日排行", "本周排行", "本月排行", "观看次数", "点赞比例", "时长最长", "他们在看"];
     let sortValue = {
@@ -68,7 +68,7 @@ function homePage() {
             setItem('p', '1');
             refreshPage(false);
         }),
-        col_type: 'flex_button'
+        col_type: 'text_5'
     });
 
     layouts.push({
@@ -77,14 +77,14 @@ function homePage() {
             require(config.依赖);
             setResult(getCategory());
         }),
-        col_type: 'flex_button'
+        col_type: 'text_5'
     });
     layouts.push({
         title: '时长',
         url: $('hiker://empty/setting' + privacyMode).rule((settingPage) => {
             setResult(settingPage());
         }, settingPage),
-        col_type: 'flex_button'
+        col_type: 'text_5'
     });
 
     let layout_style = '';
