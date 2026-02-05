@@ -99,7 +99,7 @@ function homePage() {
         try {
             layouts.push({
                 title: pdfh(li, '.title&&Text'),
-                img: pdfh(li, 'img&&data-path'),
+                img: pdfh(li, 'img&&data-path') + '@headers = { "Referer": "https://cn.pornhub.com/"}',
                 desc: pdfh(li, '.views&&Text'),
                 url: 'https://cn.pornhub.com' + pdfh(li, '.title&&a&&href') + privacyMode,
                 col_type: layout_style
