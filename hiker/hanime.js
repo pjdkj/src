@@ -139,13 +139,14 @@ function homePage() {
         "1990年": "1990+年+"
     };
     let query1 = getItem('query', '');
-    let tags1 = getItem('tags', '');
+    let broad1 = getItem('broad', 'on') == 'on' ? '&broad=on' : '';
+    let tags1 = getItem('tags', '') == '' ? '' : '&tags%5B%5D=' + getItem('tags', '');
     let genre1 = params[getItem('genre', '全部')];
     let sort1 = params[getItem('sort', '默认')];
     let date1 = params[getItem('date', '全部')];
     let duration1 = params[getItem('duration', '全部')];
-    let page = getItem('page', '1');
-    let url = host + `/search?query=${query1}&type=video&genre=${genre1}&broad=on${tags1}&sort=${sort1}&date=${date1}&duration=${duration1}&page=${page}`;
+    let page = getItem('page', '1') == '1' ? '' : '&page=' + getItem('page', '1');
+    let url = host + `/search?query=${query1}&type=video&genre=${genre1}${broad1}${tags1}&sort=${sort1}&date=${date1}&duration=${duration1}${page}`;
     log(url);
     let layout_style = 'movie_2';
 
