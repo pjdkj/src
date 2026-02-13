@@ -755,9 +755,7 @@ function danyeHtml(imgSrc, viewer, tag, style) {
     }
 
     const imgArr = list.reduce((acc, url) => {
-        if (url.startsWith('http://') || url.startsWith('https://')) {
-            acc.push(`<li><img data-src="${url}" alt="图片"></li>`);
-        }
+        acc.push(`<li><img data-src="${url}" alt="图片"></li>`);
         return acc;
     }, []);
 
