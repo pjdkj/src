@@ -3,17 +3,16 @@
     "bookSourceGroup": "🎉 小说",
     "bookSourceName": "69书吧(VPN)",
     "bookSourceType": 0,
-    "bookSourceUrl": "https://www.69shuba.com##平静",
-    "concurrentRate": "1000",
+    "bookSourceUrl": "https://www.69shuba.com",
     "customButton": false,
-    "customOrder": 3,
+    "customOrder": 9,
     "enabled": true,
     "enabledCookieJar": true,
     "enabledExplore": false,
     "eventListener": false,
     "header": "@js:\nJSON.stringify({\n\t\"User-Agent\":  java.getWebViewUA(),\n\t\"X-Requested-With\": \"com.microsoft.emmx\"\n})",
-    "lastUpdateTime": 1768479531593,
-    "loginCheckJs": "if (/#cfts/.test(result.body())) {\n    let url = String(key ? java.ruleUrl : result.url());\n    let host = String(url).replace(/(.*\\/\\/[^/]+)\\/.*/, \"$1\");\n    cookie.removeCookie(host);\n    java.startBrowserAwait(url, \"验证\");\n    result = java.connect(url);\n}\nresult",
+    "lastUpdateTime": 1770287606441,
+    "loginCheckJs": "if (/#cfts/.test(result.body())||/Just a moment/.test(result.body())) {\n    let url = String(key ? java.ruleUrl : result.url());\n    let host = String(url).replace(/(.*\\/\\/[^/]+)\\/.*/, \"$1\");\n    cookie.removeCookie(host);\n    java.startBrowserAwait(url, \"验证\");\n    java.initUrl();\n    result = java.getStrResponse();\n    //result = java.connect(url);\n}\nresult",
     "respondTime": 180000,
     "ruleBookInfo": {
       "author": ".booknav2 p.0@text",
@@ -26,7 +25,6 @@
       "wordCount": ".booknav2 p.2@text"
     },
     "ruleContent": {
-      "callBackJs": "if (event == \"clickCustomButton\") {\n    java.toast(\"666\");\n}",
       "content": ".txtnav@html##<h1[\\s\\S]+?</h1>|^\\s*<[a-z]+ .*>|<\\/[a-z]+>$|(?<!^)<div[\\s\\S]*?</div>\\s*",
       "replaceRegex": "##^[^，。！？…”」】]{2,}\\n|.*(第[^，。]+章|谢[^，。]+打赏|[首发更新最快]{3,}|本章完|补更|追读|加更|月票|章节|求票|本站域名).*\\n?|.*[6六陆].*?[9九玖].*?[书書].*?[吧].*",
       "title": "h1@text"

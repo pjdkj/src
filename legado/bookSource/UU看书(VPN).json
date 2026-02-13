@@ -1,0 +1,50 @@
+[
+  {
+    "bookSourceGroup": "🎉 小说",
+    "bookSourceName": "UU看书(VPN)",
+    "bookSourceType": 0,
+    "bookSourceUrl": "https://uukanshu.cc",
+    "concurrentRate": "1000",
+    "customButton": false,
+    "customOrder": 2,
+    "enabled": true,
+    "enabledCookieJar": true,
+    "enabledExplore": false,
+    "eventListener": false,
+    "header": "@js:\nJSON.stringify({\n\t\"User-Agent\":  java.getWebViewUA()\n})",
+    "lastUpdateTime": 1770917000485,
+    "respondTime": 180000,
+    "ruleBookInfo": {
+      "author": "a",
+      "coverUrl": "c",
+      "init": "@js:\n$ = (_) => java.t2s(java.getString(_));\n({\n    n: $(\"[property$=book_name]@content\"),\n    a: $(\"[property$=author]@content\"),\n    k: $(\"[property~=category|status|update_time]@content\"),\n    w: $(\".booktag .blue:first-of-type@text\"),\n    l: $(\"[property~=las?test_chapter_name]@content\"),\n    i: $(\"[property$=description]@content\"),\n    c: $(\"[property$=image]@content\")\n});",
+      "intro": "i",
+      "kind": "k",
+      "lastChapter": "l",
+      "name": "n",
+      "wordCount": "w"
+    },
+    "ruleContent": {
+      "content": ".readcotent@html@js:java.t2s(result);",
+      "replaceRegex": "##本小说最新章节在首发，请您到去看！|更多最新热门小说在看！|本作品由整理上载~~|原文在.*?看！\\n|在一一看无一错版本！\\n|无.*?错.*?首.*?发.*?内.*?容.*?在.*?看！\\n|最.*?新.*?小.*?说.*?在.*?首.*?发！\\n"
+    },
+    "ruleExplore": {},
+    "ruleSearch": {
+      "author": ".author>a@text@js:java.t2s(result);",
+      "bookList": ".bookbox",
+      "bookUrl": "a.0@href",
+      "coverUrl": "a.0@href\n<js>\nlet id = result.match(/book\\/(\\d+)/)[1];\nlet n;\nif (Number(id) < 1000){\n    n = 0;\n}else{\n    n = id.slice(0,-3);\n}\n`https://image.uukanshu.cc/${n}/${id}/${id}s.jpg`\n</js>",
+      "intro": ".update@textNodes@js:java.t2s(result);",
+      "lastChapter": ".cat a@text@js:java.t2s(result);",
+      "name": ".bookname@text@js:java.t2s(result);",
+      "wordCount": ".author.1@text##字數："
+    },
+    "ruleToc": {
+      "chapterList": "#list-chapterAll dd",
+      "chapterName": "a@text@js:java.t2s(result);",
+      "chapterUrl": "a@href"
+    },
+    "searchUrl": "https://uukanshu.cc/search/{{key}}/1.html",
+    "weight": 0
+  }
+]

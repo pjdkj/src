@@ -1,0 +1,51 @@
+[
+  {
+    "bookSourceGroup": "🎉 小说",
+    "bookSourceName": "搜笔趣阁(VPN)",
+    "bookSourceType": 0,
+    "bookSourceUrl": "https://www.sobqg.com",
+    "customButton": false,
+    "customOrder": 1,
+    "enabled": false,
+    "enabledCookieJar": true,
+    "enabledExplore": false,
+    "eventListener": false,
+    "header": "<js>\nJSON.stringify({\n\t\"User-Agent\": java.getWebViewUA(),\n\t\"Referer\": source.getKey()\n\t});\n</js>",
+    "lastUpdateTime": 1770749911114,
+    "loginCheckJs": "if (key) {\n    let url = String(key ? java.ruleUrl : result.url());\n    let host = String(url).replace(/(.*\\/\\/[^/]+)\\/.*/, \"$1\");\n    cookie.removeCookie(host);\n    result = java.startBrowserAwait(url, \"验证\", false);\n}\nresult",
+    "respondTime": 180000,
+    "ruleBookInfo": {
+      "author": "a",
+      "coverUrl": "c",
+      "init": "@js:\n$ = (_) => java.getString(_);\n({\n    n: $(\"[property$=book_name]@content\"),\n    a: $(\"[property$=author]@content\"),\n    k: $(\"[property~=category|status|update_time]@content\"),\n    w: $(\"@@class.mr15.-1@span@text\"),\n    l: $(\"[property~=las?test_chapter_name]@content\"),\n    i: $(\"[property$=description]@content\"),\n    c: $(\"[property$=image]@content\"),\n    t: String(baseUrl).replace(/\\/book\\//, \"/files/book/scripts/\").replace(/.html/, \"/catalog.js\")\n});",
+      "intro": "i",
+      "kind": "k",
+      "lastChapter": "l",
+      "name": "n",
+      "tocUrl": "t",
+      "wordCount": "w"
+    },
+    "ruleContent": {
+      "content": "#artWrap@html"
+    },
+    "ruleExplore": {},
+    "ruleSearch": {
+      "author": "span.1@text",
+      "bookList": "#books li",
+      "bookUrl": "a.0@href",
+      "coverUrl": "img@data-original",
+      "intro": "p.0@text",
+      "kind": "{{@@span.0@text}} {{@@span.3@text}}",
+      "lastChapter": "span.4@a@text",
+      "name": "h3@text",
+      "wordCount": "span.2@text"
+    },
+    "ruleToc": {
+      "chapterList": "<js>\nString(result).replace(/var chapterList=/, \"\");\n</js>\n$.bookVolumeList[0].bookChapterList[*];",
+      "chapterName": "$.chapter_name",
+      "chapterUrl": "$.id\n<js>\nString(book.bookUrl).replace(/\\/book\\//, \"/read/\").replace(/.html/, \"/\" + result + \".html\")\n</js>"
+    },
+    "searchUrl": "https://www.sobqg.com/searchBook.html?keyword={{key}}",
+    "weight": 0
+  }
+]
