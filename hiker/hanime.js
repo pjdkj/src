@@ -282,17 +282,18 @@ function setTags(params, iconHost) {
                 let tags = getItem('tags', '');
                 if (tags.includes(curr)) {
                     setItem('tags', tags.replace(curr, ''));
-                    updateItem(curr, { extra: { backgroundColor: '#dc143c' } });
+                    updateItem(curr, { extra: { backgroundColor: '' } });
                 }
                 else {
                     setItem('tags', tags + curr);
-                    updateItem(curr, { extra: { backgroundColor: '' } });
+                    updateItem(curr, { extra: { backgroundColor: '#45DB5E' } });
                 }
                 return 'hiker://empty';
             }, cur),
             col_type: 'flex_button',
             extra: {
-                id: cur
+                id: cur,
+                backgroundColor: getItem('tags', '').includes(cur) ? '#45DB5E' : ''
             }
         })
     });
