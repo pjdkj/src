@@ -277,11 +277,16 @@ function setTags(params, iconHost) {
     });
     ypsx.forEach((cur) => {
         layouts.push({
-            title: small(cur),
+            title: cur,
             url: $('#noLoading#').lazyRule(() => {
-                if (getItem('searchParam', '') != '&o=mv') {
-                    setItem('searchParam', '&o=mv');
-                    refreshPage(false);
+                let tags = getItem('tags', '');
+                if (tags.includes(cur)) {
+                    setItem('tags', tags.replace(cur,''));
+                    updateItem(cur, { title: colorFont('red', cur) });
+                }
+                else {
+                    setItem('tags', tags + cur);
+                    updateItem(cur, { title: colorFont('black', cur) });
                 }
                 return 'hiker://empty';
             }),
@@ -292,7 +297,7 @@ function setTags(params, iconHost) {
         })
     });
     layouts.push({
-        title: small('人物关系'),
+        title: b('人物关系'),
         col_type: 'rich_text',
         extra: { lineSpacing: 8 },
     });
@@ -313,7 +318,7 @@ function setTags(params, iconHost) {
         })
     });
     layouts.push({
-        title: small('角色设定'),
+        title: b('角色设定'),
         col_type: 'rich_text',
         extra: { lineSpacing: 8 },
     });
@@ -334,7 +339,7 @@ function setTags(params, iconHost) {
         })
     });
     layouts.push({
-        title: small('外貌身材'),
+        title: b('外貌身材'),
         col_type: 'rich_text',
         extra: { lineSpacing: 8 },
     });
@@ -355,7 +360,7 @@ function setTags(params, iconHost) {
         })
     });
     layouts.push({
-        title: small('情境场所'),
+        title: b('情境场所'),
         col_type: 'rich_text',
         extra: { lineSpacing: 8 },
     });
@@ -376,7 +381,7 @@ function setTags(params, iconHost) {
         })
     });
     layouts.push({
-        title: small('故事剧情'),
+        title: b('故事剧情'),
         col_type: 'rich_text',
         extra: { lineSpacing: 8 },
     });
@@ -397,7 +402,7 @@ function setTags(params, iconHost) {
         })
     });
     layouts.push({
-        title: small('性交体位'),
+        title: b('性交体位'),
         col_type: 'rich_text',
         extra: { lineSpacing: 8 },
     });
