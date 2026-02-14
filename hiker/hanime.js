@@ -277,16 +277,16 @@ function setTags(params, iconHost) {
     });
     ypsx.forEach((cur) => {
         layouts.push({
-            title: colorFont('green', cur),
+            title: cur,
             url: $('#noLoading#').lazyRule((curr) => {
                 let tags = getItem('tags', '');
                 if (tags.includes(curr)) {
-                    setItem('tags', tags.replace(curr,''));
-                    updateItem(curr, { title: colorFont('red', curr) });
+                    setItem('tags', tags.replace(curr, ''));
+                    updateItem(curr, { extra: { backgroundColor: '#dc143c' } });
                 }
                 else {
-                    setItem('tags', tags + crur);
-                    updateItem(curr, { title: colorFont('black', curr) });
+                    setItem('tags', tags + curr);
+                    updateItem(curr, { extra: { backgroundColor: '' } });
                 }
                 return 'hiker://empty';
             }, cur),
