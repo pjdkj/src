@@ -140,9 +140,10 @@ function homePage() {
         "1991年": "1991+年+",
         "1990年": "1990+年+"
     };
+    
     let query1 = getItem('query', '');
     let broad1 = getItem('broad', '') == 'on' ? '&broad=on' : '';
-    let tags1 = getItem('tags', '') == '' ? '' : '&tags%5B%5D=' + getItem('tags', '');
+    let tags1 = getItem('tags', '') == '' ? '' : getItem('tags', '');
     let genre1 = params[getItem('genre', '全部')];
     let sort1 = params[getItem('sort', '默认')];
     let date1 = params[getItem('date', '全部')];
@@ -278,22 +279,23 @@ function setTags(params, iconHost) {
     ypsx.forEach((cur) => {
         layouts.push({
             title: cur,
-            url: $('#noLoading#').lazyRule((curr) => {
+            url: $('#noLoading#').lazyRule((c, p) => {
                 let tags = getItem('tags', '');
-                if (tags.includes(curr)) {
-                    setItem('tags', tags.replace(curr, ''));
-                    updateItem(curr, { extra: { backgroundColor: '' } });
+                let tag1 = '&tags%5B%5D=' + p[c];
+                if (tags.includes(tag1)) {
+                    setItem('tags', tags.replace(tag1, ''));
+                    updateItem(c, { extra: { backgroundColor: '' } });
                 }
                 else {
-                    setItem('tags', tags + curr);
-                    updateItem(curr, { extra: { backgroundColor: '#45DB5E' } });
+                    setItem('tags', tags + tag1);
+                    updateItem(c, { extra: { backgroundColor: '#45DB5E' } });
                 }
                 return 'hiker://empty';
-            }, cur),
+            }, cur, params),
             col_type: 'flex_button',
             extra: {
                 id: cur,
-                backgroundColor: getItem('tags', '').includes(cur) ? '#45DB5E' : ''
+                backgroundColor: getItem('tags', '').includes(params[cur]) ? '#45DB5E' : ''
             }
         })
     });
@@ -305,16 +307,23 @@ function setTags(params, iconHost) {
     rwgx.forEach((cur) => {
         layouts.push({
             title: cur,
-            url: $('#noLoading#').lazyRule(() => {
-                if (getItem('searchParam', '') != '&o=mv') {
-                    setItem('searchParam', '&o=mv');
-                    refreshPage(false);
+            url: $('#noLoading#').lazyRule((c, p) => {
+                let tags = getItem('tags', '');
+                let tag1 = '&tags%5B%5D=' + p[c];
+                if (tags.includes(tag1)) {
+                    setItem('tags', tags.replace(tag1, ''));
+                    updateItem(c, { extra: { backgroundColor: '' } });
+                }
+                else {
+                    setItem('tags', tags + tag1);
+                    updateItem(c, { extra: { backgroundColor: '#45DB5E' } });
                 }
                 return 'hiker://empty';
-            }),
+            }, cur, params),
             col_type: 'flex_button',
             extra: {
-                id: cur
+                id: cur,
+                backgroundColor: getItem('tags', '').includes(params[cur]) ? '#45DB5E' : ''
             }
         })
     });
@@ -326,16 +335,23 @@ function setTags(params, iconHost) {
     jssd.forEach((cur) => {
         layouts.push({
             title: cur,
-            url: $('#noLoading#').lazyRule(() => {
-                if (getItem('searchParam', '') != '&o=mv') {
-                    setItem('searchParam', '&o=mv');
-                    refreshPage(false);
+            url: $('#noLoading#').lazyRule((c, p) => {
+                let tags = getItem('tags', '');
+                let tag1 = '&tags%5B%5D=' + p[c];
+                if (tags.includes(tag1)) {
+                    setItem('tags', tags.replace(tag1, ''));
+                    updateItem(c, { extra: { backgroundColor: '' } });
+                }
+                else {
+                    setItem('tags', tags + tag1);
+                    updateItem(c, { extra: { backgroundColor: '#45DB5E' } });
                 }
                 return 'hiker://empty';
-            }),
+            }, cur, params),
             col_type: 'flex_button',
             extra: {
-                id: cur
+                id: cur,
+                backgroundColor: getItem('tags', '').includes(params[cur]) ? '#45DB5E' : ''
             }
         })
     });
@@ -347,16 +363,23 @@ function setTags(params, iconHost) {
     wmsc.forEach((cur) => {
         layouts.push({
             title: cur,
-            url: $('#noLoading#').lazyRule(() => {
-                if (getItem('searchParam', '') != '&o=mv') {
-                    setItem('searchParam', '&o=mv');
-                    refreshPage(false);
+            url: $('#noLoading#').lazyRule((c, p) => {
+                let tags = getItem('tags', '');
+                let tag1 = '&tags%5B%5D=' + p[c];
+                if (tags.includes(tag1)) {
+                    setItem('tags', tags.replace(tag1, ''));
+                    updateItem(c, { extra: { backgroundColor: '' } });
+                }
+                else {
+                    setItem('tags', tags + tag1);
+                    updateItem(c, { extra: { backgroundColor: '#45DB5E' } });
                 }
                 return 'hiker://empty';
-            }),
+            }, cur, params),
             col_type: 'flex_button',
             extra: {
-                id: cur
+                id: cur,
+                backgroundColor: getItem('tags', '').includes(params[cur]) ? '#45DB5E' : ''
             }
         })
     });
@@ -368,16 +391,23 @@ function setTags(params, iconHost) {
     qjcs.forEach((cur) => {
         layouts.push({
             title: cur,
-            url: $('#noLoading#').lazyRule(() => {
-                if (getItem('searchParam', '') != '&o=mv') {
-                    setItem('searchParam', '&o=mv');
-                    refreshPage(false);
+            url: $('#noLoading#').lazyRule((c, p) => {
+                let tags = getItem('tags', '');
+                let tag1 = '&tags%5B%5D=' + p[c];
+                if (tags.includes(tag1)) {
+                    setItem('tags', tags.replace(tag1, ''));
+                    updateItem(c, { extra: { backgroundColor: '' } });
+                }
+                else {
+                    setItem('tags', tags + tag1);
+                    updateItem(c, { extra: { backgroundColor: '#45DB5E' } });
                 }
                 return 'hiker://empty';
-            }),
+            }, cur, params),
             col_type: 'flex_button',
             extra: {
-                id: cur
+                id: cur,
+                backgroundColor: getItem('tags', '').includes(params[cur]) ? '#45DB5E' : ''
             }
         })
     });
@@ -389,16 +419,23 @@ function setTags(params, iconHost) {
     gsjq.forEach((cur) => {
         layouts.push({
             title: cur,
-            url: $('#noLoading#').lazyRule(() => {
-                if (getItem('searchParam', '') != '&o=mv') {
-                    setItem('searchParam', '&o=mv');
-                    refreshPage(false);
+            url: $('#noLoading#').lazyRule((c, p) => {
+                let tags = getItem('tags', '');
+                let tag1 = '&tags%5B%5D=' + p[c];
+                if (tags.includes(tag1)) {
+                    setItem('tags', tags.replace(tag1, ''));
+                    updateItem(c, { extra: { backgroundColor: '' } });
+                }
+                else {
+                    setItem('tags', tags + tag1);
+                    updateItem(c, { extra: { backgroundColor: '#45DB5E' } });
                 }
                 return 'hiker://empty';
-            }),
+            }, cur, params),
             col_type: 'flex_button',
             extra: {
-                id: cur
+                id: cur,
+                backgroundColor: getItem('tags', '').includes(params[cur]) ? '#45DB5E' : ''
             }
         })
     });
@@ -410,16 +447,23 @@ function setTags(params, iconHost) {
     xjtw.forEach((cur) => {
         layouts.push({
             title: cur,
-            url: $('#noLoading#').lazyRule(() => {
-                if (getItem('searchParam', '') != '&o=mv') {
-                    setItem('searchParam', '&o=mv');
-                    refreshPage(false);
+            url: $('#noLoading#').lazyRule((c, p) => {
+                let tags = getItem('tags', '');
+                let tag1 = '&tags%5B%5D=' + p[c];
+                if (tags.includes(tag1)) {
+                    setItem('tags', tags.replace(tag1, ''));
+                    updateItem(c, { extra: { backgroundColor: '' } });
+                }
+                else {
+                    setItem('tags', tags + tag1);
+                    updateItem(c, { extra: { backgroundColor: '#45DB5E' } });
                 }
                 return 'hiker://empty';
-            }),
+            }, cur, params),
             col_type: 'flex_button',
             extra: {
-                id: cur
+                id: cur,
+                backgroundColor: getItem('tags', '').includes(params[cur]) ? '#45DB5E' : ''
             }
         })
     });
