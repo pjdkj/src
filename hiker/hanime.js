@@ -48,14 +48,14 @@ function homePage() {
                     let tags1 = extractTags(str1);
                     let tags2 = extractTags(str2);
                     if (tags1.length !== tags2.length) {
-                        return false;
+                        return true;
                     }
                     for (let i = 0; i < tags1.length; i++) {
                         if (tags1[i] !== tags2[i]) {
-                            return false;
+                            return true;
                         }
                     }
-                    return true;
+                    return false;
                 }
 
                 if (isTagsEquivalent(tag1, tag2)) {
