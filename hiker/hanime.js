@@ -40,27 +40,17 @@ function homePage() {
             addListener('onClose', $.toString((tag1) => {
                 let tag2 = getItem('tags', '');
                 function isTagsEquivalent(str1, str2) {
-                    function extractTags(str) {
-                        var tags = [];
-                        var parts = str.split('&');
-                        for (var i = 0; i < parts.length; i++) {
-                            if (parts[i].indexOf('tags%5B%5D=') === 0) {
-                                var value = parts[i].substring('tags%5B%5D='.length);
-                                try {
-                                    value = decodeURIComponent(value);
-                                } catch (e) { }
-                                tags.push(value);
-                            }
-                        }
-                        tags.sort();
-                        return tags;
-                    }
-                    var tags1 = extractTags(str1);
-                    var tags2 = extractTags(str2);
+                    const extractTags = (str) => {
+                        let matches = str.match(/&tags%5B%5D=[^&]*/g);
+                        return matches ? matches.sort() : [];
+                    };
+
+                    let tags1 = extractTags(str1);
+                    let tags2 = extractTags(str2);
                     if (tags1.length !== tags2.length) {
                         return false;
                     }
-                    for (var i = 0; i < tags1.length; i++) {
+                    for (let i = 0; i < tags1.length; i++) {
                         if (tags1[i] !== tags2[i]) {
                             return false;
                         }
