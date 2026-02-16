@@ -35,7 +35,7 @@ function homePage() {
     });
     layouts.push({
         title: '标签',
-        url: $().rule((setTags) => {
+        url: $('hiker://empty' + privacyMode).rule((setTags) => {
             let broad_1 = getItem('broad', '');
             let tag_1 = getItem('tags', '');
             addListener('onClose', $.toString((tag1, broad_1) => {
