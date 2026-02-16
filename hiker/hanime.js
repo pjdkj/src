@@ -36,8 +36,10 @@ function homePage() {
     layouts.push({
         title: '标签',
         url: $().rule((setTags) => {
-            let tag1 = getItem('tags', '');
-            addListener('onClose', $.toString((tag1) => {
+            let broad_1 = getItem('broad', '');
+            let tag_1 = getItem('tags', '');
+            addListener('onClose', $.toString((tag1, broad_1) => {
+                let broad_2 = getItem('broad', '');
                 let tag2 = getItem('tags', '');
                 function isTagsEquivalent(str1, str2) {
                     const extractTags = (str) => {
@@ -57,11 +59,13 @@ function homePage() {
                     }
                     return false;
                 }
-
+                if (broad_1 != broad_2) {
+                    refreshPage(false);
+                }
                 if (isTagsEquivalent(tag1, tag2)) {
                     refreshPage(false);
                 }
-            }, tag1))
+            }, tag_1, broad_1))
             setResult(setTags());
         }, setTags),
         col_type: 'text_5'
