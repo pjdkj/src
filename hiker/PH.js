@@ -68,6 +68,15 @@ function homePage() {
     layouts.push({
         title: '设置',
         url: $('hiker://empty/setting' + privacyMode).rule((settingPage) => {
+            let sty1 = getItem('layout_style', '4');
+            let pm1 = getItem('privacyMode', '#noHistory##noRecordHistory#')
+            addListener('onClose', $.toString((sty1, pm1) => {
+                let sty2 = getItem('layout_style', '4');
+                let pm2 = getItem('privacyMode', '#noHistory##noRecordHistory#');
+                if (sty1 != sty2 || pm1 != pm2) {
+                    refreshPage(false);
+                }
+            }, sty1, pm1))
             setResult(settingPage());
         }, settingPage),
         pic_url: 'hiker://images/home_setting',
