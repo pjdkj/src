@@ -36,6 +36,23 @@ function homePage() {
     layouts.push({
         title: '标签',
         url: $().rule((setTags) => {
+            let tag1 = getItem('tags', '');
+            addListener('onClose', $.toString((tag1) => {
+                let tag2 = getItem('tags', '');
+                function isTagsEquivalent(str1, str2) {
+                    const getSortedTags = str =>
+                        new URLSearchParams(str)
+                            .getAll('tags[]')
+                            .map(decodeURIComponent)
+                            .sort()
+                            .join(',');
+
+                    return getSortedTags(str1) === getSortedTags(str2);
+                }
+                if (isTagsEquivalent(tag1, tag2)) {
+                    refreshPage(false);
+                }
+            }, tag1))
             setResult(setTags());
         }, setTags),
         col_type: 'text_5'
@@ -91,12 +108,12 @@ function homePage() {
         "点赞比例": "讚好比例",
         "时长最长": "時長最長",
         "他们在看": "他們在看",
-        "1 分钟 +": "1+分鐘++",
-        "5 分钟 +": "5+分鐘++",
-        "10 分钟 +": "10+分鐘++",
-        "20 分钟 +": "20+分鐘++",
-        "30 分钟 +": "30+分鐘++",
-        "60 分钟 +": "60+分鐘++",
+        "1 分钟 +": "1+分鐘+%2B",
+        "5 分钟 +": "5+分鐘+%2B",
+        "10 分钟 +": "10+分鐘+%2B",
+        "20 分钟 +": "20+分鐘+%2B",
+        "30 分钟 +": "30+分鐘+%2B",
+        "60 分钟 +": "60+分鐘+%2B",
         "0 - 10 分钟": "0+-+10+分鐘",
         "0 - 20 分钟": "0+-+20+分鐘",
         "今天": "過去+24+小時",
