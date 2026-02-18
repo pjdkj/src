@@ -32,7 +32,7 @@ function homePage() {
     let jingxuan = ['主页', '最新精选', '最热门', '最多观看', '最高分', '最长'];
     layouts.push({
         title: '精选',
-        url: $(jingxuan, 2, '').select(() => {
+        url: $(jingxuan, 2, '当前：' + getItem('jx', '主页')).select(() => {
             setItem('jx', input);
             setItem('p', '1');
             refreshPage(false);
@@ -316,18 +316,17 @@ function getStarDetails(link, page) {
         for (let i = 0; i < sorts.length; i++) {
             layouts.push({
                 title: sorts[i],
-                url: $('#noLoading#').lazyRule(
-                    (params, i) => {
-                        if (getItem('starDetailParam', '') != params[i]) {
-                            setItem('starDetailParam', params[i]);
-                            refreshPage(false);
-                        }
-                        return 'hiker://empty';
-                    },
-                    params,
-                    i
-                ),
+                url: $('#noLoading#').lazyRule((params, i) => {
+                    if (getItem('starDetailParam', '') != params[i]) {
+                        setItem('starDetailParam', params[i]);
+                        refreshPage(false);
+                    }
+                    return 'hiker://empty';
+                }, params, i),
                 col_type: 'flex_button',
+                extra: {
+                    backgroundColor: getItem('starDetailParam', '') == params[i] ? '#45DB5E' : ''
+                }
             });
         }
     }
@@ -402,6 +401,9 @@ function getCategoryDetails(link, page) {
                     return 'hiker://empty';
                 }, params, i),
                 col_type: 'scroll_button',
+                extra: {
+                    backgroundColor: getItem('categoryParam', '') == params[i] ? '#45DB5E' : ''
+                }
             })
         }
     }
@@ -588,11 +590,9 @@ function settingPage() {
     layouts.push(
         {
             title:
-                small(b('更新日期：2025-05-14 &nbsp;&nbsp; By &nbsp; 平静')) +
+                small(b('更新日期：2026-02-18 &nbsp;&nbsp; By &nbsp; 平静')) +
                 br() +
-                small('1.返回后刷新') +
-                br() +
-                small(colorFont('#ff2700', '2.禁止转载')),
+                small(colorFont('#ff2700', '1.禁止转载')),
             col_type: 'rich_text',
             extra: { lineSpacing: 8 },
         },
