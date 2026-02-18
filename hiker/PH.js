@@ -272,7 +272,10 @@ function getStars(page) {
                     }
                     return 'hiker://empty';
                 }, params, i),
-                col_type: 'text_4',
+                col_type: 'scroll_button',
+                extra: {
+                    backgroundColor: getItem('starParam', '') == params[i] ? '#45DB5E' : ''
+                }
             })
         }
     }
