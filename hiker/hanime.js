@@ -192,7 +192,9 @@ function homePage() {
                 img: pdfh(li, 'img&&src'),
                 desc: pdfh(li, '.stat-item,1&&Text'),
                 url: $('hiker://empty' + privacyMode).rule((getVideoDetail, url, privacyMode) => {
-                    setResult(getVideoDetail(url, privacyMode))
+                    setItem('videoUrl', url);
+                    addListener('onClose', $.toString(() => { setItem('videoUrl', ''); }));
+                    setResult(getVideoDetail(getItem('videoUrl', ''), privacyMode))
                 }, getVideoDetail, pdfh(li, 'a,0&&href'), privacyMode),
                 col_type: layout_style
             });
@@ -493,8 +495,8 @@ function setTags(params, iconHost) {
     return layouts
 }
 function getVideoDetail(url, privacyMode) {
-    function big(e) {
-        return '<big>' + e + '</big>'
+    function small(e) {
+        return '<small>' + e + '</small>'
     }
 
     let layouts = [];
@@ -519,13 +521,8 @@ function getVideoDetail(url, privacyMode) {
         col_type: 'card_pic_1'
     })
     layouts.push({
-            title: big(pdfh(res, 'h3&&Text')) + '<br>' + pdfh(res, 'h3+div&&Text'),
+            title: pdfh(res, 'h3&&Text') + '<br>' + small(pdfh(res, 'h3+div&&Text')),
             col_type: 'rich_text'
-    })
-    layouts.push({
-        title: pdfh(res, '#video-user-avatar&&alt'),
-        img: pdfh(res, '#video-user-avatar&&src') + '@headers={"Accept":"image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8"}',
-        col_type: 'avatar'
     })
     layouts.push({
         title: '画质：',
@@ -538,5 +535,50 @@ function getVideoDetail(url, privacyMode) {
             col_type: 'flex_button'
         })
     })
+
+    const idMap = new Map();
+    let relatedVideo = pdfa(res, '#playlist-scroll&&.related-watch-wrap');
+    relatedVideo.forEach((cur) => {
+        let url = pdfh(cur, 'a,0&&href');
+        const match = url.match(/v=(\d+)/)[1];
+        if (match) {
+            const id = parseInt(match, 10);
+            idMap.set(id, url);
+            idMap.set(id + 't', pdfh(cur, '.card-mobile-title&&Text'));
+            idMap.set(id + 'i', pdfh(cur, 'img,1&&src'));
+            idMap.set(id + 'a', pdfh(cur, '.card-mobile-genre-wrapper&&a&&Text'));
+            idMap.set(id + 'd', pdfh(cur, '.card-mobile-duration,-1&&Text'));
+        }
+    })
+    let startId = parseInt(url.match(/v=(\d+)/)[1]);
+
+    const resultIds = new Set();
+    resultIds.add(startId);
+
+    let left = startId - 1;
+    while (idMap.has(left)) {
+        resultIds.add(left);
+        left--;
+    }
+
+    let right = startId + 1;
+    while (idMap.has(right)) {
+        resultIds.add(right);
+        right++;
+    }
+
+    let relatedURLS = Array.from(resultIds).sort((a, b) => a - b);
+    relatedURLS.forEach((cur) => {
+        layouts.push({
+            title: idMap.get(cur + 't'),
+            url: $.toString(() => {
+                setItem('videoUrl', idMap.get(cur));
+                refreshPage();
+            }),
+            img: idMap.get(cur + 'i'),
+            desc: idMap.get(cur + 'a') + idMap.get(cur + 'd'),
+        })
+    })
+    
     return layouts
 }
