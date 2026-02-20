@@ -189,7 +189,7 @@ function homePage() {
             layouts.push({
                 title: pdfh(li, '.subtitle&&Text'),
                 img: pdfh(li, 'img&&src'),
-                desc: pdfh(li, '.duration&&Text') + '&' + pdfh(li, '.stat-item&&Text'),
+                desc: pdfh(li, '.stat-item,1&&Text'),
                 url: pdfh(li, 'a,0&&href') + privacyMode,
                 col_type: layout_style
             });
@@ -203,10 +203,10 @@ function homePage() {
         {
             title: '上一页',
             url: $('').lazyRule(() => {
-                let p = Number(getItem('p', '1'));
+                let p = Number(getItem('page', '1'));
                 if (p > 1) {
                     p = p - 1;
-                    setItem('p', p.toString());
+                    setItem('page', p.toString());
                 }
                 refreshPage();
                 return 'hiker://empty';
@@ -214,11 +214,11 @@ function homePage() {
             col_type: 'text_3',
         },
         {
-            title: getItem('p', '1') + ' / ' + pdfh(res, '.pagination&&.page-item,-2&&Text'),
+            title: getItem('page', '1') + ' / ' + pdfh(res, '.pagination&&.page-item,-2&&Text'),
             url: $('', '页数').input(() => {
                 let p = parseInt(input.trim());
                 if (!isNaN(p)) {
-                    setItem('p', p.toString());
+                    setItem('page', p.toString());
                     refreshPage();
                     return 'hiker://empty';
                 } else {
@@ -230,9 +230,9 @@ function homePage() {
         {
             title: '下一页',
             url: $('').lazyRule(() => {
-                let p = Number(getItem('p', '1'));
+                let p = Number(getItem('page', '1'));
                 p = p + 1;
-                setItem('p', p.toString());
+                setItem('page', p.toString());
                 refreshPage();
                 return 'hiker://empty';
             }),
