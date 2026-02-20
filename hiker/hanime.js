@@ -515,13 +515,11 @@ function getVideoDetail(url, privacyMode) {
         size.add(parseInt(pdfh(list[i], 'source&&size')));
         videoLink.set(parseInt(pdfh(list[i], 'source&&size')), pdfh(list[i], 'source&&src'))
     }
-    let urls = Array.from(size)
-        .sort((a, b) => b - a)
-        .map(id => videoLink.get(id));
+    let uid = Array.from(size).sort((a, b) => b - a);
 
     layouts.push({
         title: '',
-        url: urls[0],
+        url: videoLink.get(uid[0]),
         img: pdfh(res, '#player&&poster'),
         desc: '0',
         col_type: 'card_pic_1'
@@ -535,10 +533,10 @@ function getVideoDetail(url, privacyMode) {
         url: '',
         col_type: 'flex_button'
     })
-    urls.forEach((cur) => {
+    uid.forEach((id) => {
         layouts.push({
-            title: cur.match(/\/\d+[^\d]+(\d+)p/)[1] + 'p',
-            url: cur,
+            title: id + 'p',
+            url: videoLink.get(id),
             col_type: 'flex_button'
         })
     })
