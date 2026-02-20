@@ -493,6 +493,10 @@ function setTags(params, iconHost) {
     return layouts
 }
 function getVideoDetail(url, privacyMode) {
+    function big(e) {
+        return '<big>' + e + '</big>'
+    }
+
     let layouts = [];
     let res = fetch(url + privacyMode);
 
@@ -510,12 +514,32 @@ function getVideoDetail(url, privacyMode) {
     layouts.push({
         title: '',
         url: urls[0],
-        img: pdfh(),
+        img: pdfh(res, '#player&&poster'),
+        desc: '0',
         col_type: 'card_pic_1'
+    })
+    layouts.push(
+        {
+            title: big(pdfh(res, 'h3&&Text')),
+            col_type: 'rich_text'
+        },
+        {
+            title: pdfh(res, 'h3+div&&Text'),
+            col_type: 'rich_text'
+        }
+    )
+    layouts.push({
+        title: pdfh(res, '#video-user-avatar&&alt'),
+        img: pdfh(res, '#video-user-avatar&&src'),
+        col_type: 'avatar'
+    })
+    layouts.push({
+        title: '画质：',
+        col_type: 'flex_button'
     })
     urls.forEach((cur) => {
         layouts.push({
-            title: cur.match(/\d+-(\d+)p/)[1],
+            title: cur.match(/\d+-(\d+)p/)[1] + 'p',
             url: cur,
             col_type: 'flex_button'
         })
