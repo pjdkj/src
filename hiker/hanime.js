@@ -180,7 +180,7 @@ function homePage() {
     let duration1 = params[getItem('duration', '全部')];
     let page = getItem('page', '1') == '1' ? '' : '&page=' + getItem('page', '1');
     let url = host + `/search?query=${query1}&type=video&genre=${genre1}${broad1}${tags1}&sort=${sort1}&date=${date1}&duration=${duration1}${page}`;
-    log(url);
+    //log(url);
     let layout_style = 'movie_2';
 
     let res = fetch(url);
@@ -538,7 +538,7 @@ function getVideoDetail(url, privacyMode) {
     })
 
     const idMap = new Map();
-    let relatedVideo = pdfa(res, '#playlist-scroll&&.related-watch-wrap');
+    let relatedVideo = pdfa(res, '#playlist-scroll--.related-watch-wrap,-1&&.related-watch-wrap');
     relatedVideo.forEach((cur) => {
         let url = pdfh(cur, 'a,0&&href');
         const match = url.match(/v=(\d+)/)[1];
@@ -553,33 +553,33 @@ function getVideoDetail(url, privacyMode) {
     })
     let startId = parseInt(url.match(/v=(\d+)/)[1]);
 
-    //const resultIds = new Set();
-    //resultIds.add(startId);
+    const resultIds = new Set();
+    resultIds.add(startId);
 
-    //let left = startId - 1;
-    //while (idMap.has(left)) {
-    //    resultIds.add(left);
-    //    left--;
-    //}
+    let left = startId - 1;
+    while (idMap.has(left)) {
+        resultIds.add(left);
+        left--;
+    }
 
-    //let right = startId + 1;
-    //while (idMap.has(right)) {
-    //    resultIds.add(right);
-    //    right++;
-    //}
+    let right = startId + 1;
+    while (idMap.has(right)) {
+        resultIds.add(right);
+        right++;
+    }
 
-    //let relatedURLS = Array.from(resultIds).sort((a, b) => a - b);
-    //relatedURLS.forEach((cur) => {
-    //    layouts.push({
-    //        title: idMap.get(cur + 't'),
-    //        url: $.toString(() => {
-    //            setItem('videoUrl', idMap.get(cur));
-    //            refreshPage();
-    //        }),
-    //        img: idMap.get(cur + 'i'),
-    //        desc: idMap.get(cur + 'a') + idMap.get(cur + 'd'),
-    //    })
-    //})
+    let relatedURLS = Array.from(resultIds).sort((a, b) => a - b);
+    relatedURLS.forEach((cur) => {
+        layouts.push({
+            title: idMap.get(cur + 't'),
+            url: $.toString(() => {
+                setItem('videoUrl', idMap.get(cur));
+                refreshPage();
+            }),
+            img: idMap.get(cur + 'i'),
+            desc: idMap.get(cur + 'a') + idMap.get(cur + 'd'),
+        })
+    })
     
     return layouts
 }
