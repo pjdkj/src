@@ -184,22 +184,23 @@ function homePage() {
     let layout_style = 'movie_2';
 
     let res = fetch(url);
-    try {
-        pdfa(res, '.horizontal-row--.video-item-container,0--.video-item-container,0&&.video-item-container').forEach(function (li) {
-            try {
-                layouts.push({
-                    title: pdfh(li, '.title&&Text'),
-                    img: pdfh(li, 'img&&src'),
-                    desc: pdfh(li, '.stat-item,1&&Text'),
-                    url: pdfh(li, 'a,0&&href') + privacyMode,
-                    col_type: layout_style
-                });
-            } catch (e) { log(e) }
-        });
-    } catch (e) { log(e) }
+    let selector = '.horizontal-row--.video-item-container,0--.video-item-container,0&&.video-item-container';
+    pdfa(res, selector).forEach(function (li) {
+        try {
+            layouts.push({
+                title: pdfh(li, '.title&&Text'),
+                img: pdfh(li, 'img&&src'),
+                desc: pdfh(li, '.stat-item,1&&Text'),
+                url: $('hiker://empty' + privacyMode).rule((getVideoDetail, url, privacyMode) => {
+                    setResult(getVideoDetail(url, privacyMode))
+                }, getVideoDetail, pdfh(li, 'a,0&&href'), privacyMode),
+                col_type: layout_style
+            });
+        } catch (e) { log(e) }
+    });
 
     let page_item
-    try { page_item = pdfh(res, '.pagination&&.page-item,-2&&Text') } catch (e) { page_item = false}
+    try { page_item = pdfh(res, '.pagination&&.page-item,-2&&Text') } catch (e) { page_item = false }
     if (page_item) {
         layouts.push(
             {
@@ -492,6 +493,32 @@ function setTags(params, iconHost) {
     return layouts
 }
 function getVideoDetail(url, privacyMode) {
+    let layouts = [];
     let res = fetch(url + privacyMode);
 
+    const videoLink = new Map()
+    const size = new Set();
+    let list = pdfa(res, '#player&&source')
+    for (let i = 0; i < list.length; i++) {
+        size.add(parseInt(pdfh(list[i], 'source&&size')));
+        videoLink.set(parseInt(pdfh(list[i], 'source&&size')), pdfh(list[i], 'source&&src'))
+    }
+    let urls = Array.from(size)
+        .sort((a, b) => b - a)
+        .map(id => videoLink.get(id));
+
+    layouts.push({
+        title: '',
+        url: urls[0],
+        img: pdfh(),
+        col_type: 'card_pic_1'
+    })
+    urls.forEach((cur) => {
+        layouts.push({
+            title: cur.match(/\d+-(\d+)p/)[1],
+            url: cur,
+            col_type: 'flex_button'
+        })
+    })
+    return layouts
 }
