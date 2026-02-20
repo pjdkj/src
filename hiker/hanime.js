@@ -498,6 +498,9 @@ function setTags(params, iconHost) {
     return layouts
 }
 function getVideoDetail(url, privacyMode) {
+    function colorFont(c, f) {
+        return '<font color="' + c + '">' + f + '</font>'
+    }
     function small(e) {
         return '<small>' + e + '</small>'
     }
@@ -524,8 +527,8 @@ function getVideoDetail(url, privacyMode) {
         col_type: 'card_pic_1'
     })
     layouts.push({
-            title: pdfh(res, 'h3&&Text') + '<br>' + small(pdfh(res, 'h3+div&&Text')),
-            col_type: 'rich_text'
+        title: pdfh(res, 'h3&&Text') + '<br>' + small(pdfh(res, 'h3+div&&Text')),
+        col_type: 'rich_text'
     })
     layouts.push({
         title: '画质：',
@@ -574,7 +577,7 @@ function getVideoDetail(url, privacyMode) {
     let relatedURLS = Array.from(resultIds).sort((a, b) => a - b);
     relatedURLS.forEach((cur) => {
         layouts.push({
-            title: idMap.get(cur + 't'),
+            title: idMap.get(cur) == url ? '““””' + colorFont('#45DB5E', idMap.get(cur + 't')) : idMap.get(cur + 't'),
             url: $('#noLoading#').lazyRule((u) => {
                 setItem('videoUrl', u);
                 setItem('sign', '1');
@@ -586,6 +589,6 @@ function getVideoDetail(url, privacyMode) {
             col_type: 'movie_1_left_pic'
         })
     })
-    
+
     return layouts
 }
