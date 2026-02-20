@@ -572,12 +572,14 @@ function getVideoDetail(url, privacyMode) {
     relatedURLS.forEach((cur) => {
         layouts.push({
             title: idMap.get(cur + 't'),
-            url: $.toString(() => {
-                setItem('videoUrl', idMap.get(cur));
+            url: $('#noLoading#').lazyRule((u) => {
+                setItem('videoUrl', u);
                 refreshPage();
-            }),
+                return 'hiker://empty';
+            }, idMap.get(cur)),
             img: idMap.get(cur + 'i'),
             desc: idMap.get(cur + 'a') + idMap.get(cur + 'd'),
+            col_type: 'movie_1_left_pic'
         })
     })
     
