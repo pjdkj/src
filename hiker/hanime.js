@@ -197,7 +197,10 @@ function homePage() {
             } catch (e) { log(e) }
         });
     } catch (e) { log(e) }
-    if (pdfh(res, '.pagination&&.page-item,-2&&Text')) {
+
+    let page_item
+    try { page_item = pdfh(res, '.pagination&&.page-item,-2&&Text') } catch (e) { page_item = false}
+    if (page_item) {
         layouts.push(
             {
                 col_type: 'blank_block',
@@ -216,7 +219,7 @@ function homePage() {
                 col_type: 'text_3',
             },
             {
-                title: getItem('page', '1') + ' / ' + pdfh(res, '.pagination&&.page-item,-2&&Text'),
+                title: getItem('page', '1') + ' / ' + page_item,
                 url: $('', '页数').input(() => {
                     let p = parseInt(input.trim());
                     if (!isNaN(p)) {
