@@ -197,50 +197,51 @@ function homePage() {
             } catch (e) { log(e) }
         });
     } catch (e) { log(e) }
-    layouts.push(
-        {
-            col_type: 'blank_block',
-        },
-        {
-            title: '上一页',
-            url: $('').lazyRule(() => {
-                let p = Number(getItem('page', '1'));
-                if (p > 1) {
-                    p = p - 1;
-                    setItem('page', p.toString());
-                }
-                refreshPage();
-                return 'hiker://empty';
-            }),
-            col_type: 'text_3',
-        },
-        {
-            title: getItem('page', '1') + ' / ' + pdfh(res, '.pagination&&.page-item,-2&&Text'),
-            url: $('', '页数').input(() => {
-                let p = parseInt(input.trim());
-                if (!isNaN(p)) {
+    if (pdfh(res, '.pagination&&.page-item,-2&&Text')) {
+        layouts.push(
+            {
+                col_type: 'blank_block',
+            },
+            {
+                title: '上一页',
+                url: $('').lazyRule(() => {
+                    let p = Number(getItem('page', '1'));
+                    if (p > 1) {
+                        p = p - 1;
+                        setItem('page', p.toString());
+                    }
+                    refreshPage();
+                    return 'hiker://empty';
+                }),
+                col_type: 'text_3',
+            },
+            {
+                title: getItem('page', '1') + ' / ' + pdfh(res, '.pagination&&.page-item,-2&&Text'),
+                url: $('', '页数').input(() => {
+                    let p = parseInt(input.trim());
+                    if (!isNaN(p)) {
+                        setItem('page', p.toString());
+                        refreshPage();
+                        return 'hiker://empty';
+                    } else {
+                        return 'toast://请输入数字';
+                    }
+                }),
+                col_type: 'text_3',
+            },
+            {
+                title: '下一页',
+                url: $('').lazyRule(() => {
+                    let p = Number(getItem('page', '1'));
+                    p = p + 1;
                     setItem('page', p.toString());
                     refreshPage();
                     return 'hiker://empty';
-                } else {
-                    return 'toast://请输入数字';
-                }
-            }),
-            col_type: 'text_3',
-        },
-        {
-            title: '下一页',
-            url: $('').lazyRule(() => {
-                let p = Number(getItem('page', '1'));
-                p = p + 1;
-                setItem('page', p.toString());
-                refreshPage();
-                return 'hiker://empty';
-            }),
-            col_type: 'text_3',
-        }
-    );
-
+                }),
+                col_type: 'text_3',
+            }
+        );
+    }
     setResult(layouts);
 }
 function setTags(params, iconHost) {
