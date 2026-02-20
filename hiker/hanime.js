@@ -192,9 +192,12 @@ function homePage() {
                 img: pdfh(li, 'img&&src'),
                 desc: pdfh(li, '.stat-item,1&&Text'),
                 url: $('hiker://empty' + privacyMode).rule((getVideoDetail, url, privacyMode) => {
-                    setItem('videoUrl', url);
-                    addListener('onClose', $.toString(() => { setItem('videoUrl', ''); }));
-                    setResult(getVideoDetail(getItem('videoUrl', ''), privacyMode))
+                    addListener('onClose', $.toString(() => {
+                        setItem('videoUrl', '');
+                        setItem('sign', '0');
+                    }));
+                    let vu = getItem('sign', '0') == 1 ? getItem('videoUrl', '') : url;
+                    setResult(getVideoDetail(vu, privacyMode))
                 }, getVideoDetail, pdfh(li, 'a,0&&href'), privacyMode),
                 col_type: layout_style
             });
@@ -574,11 +577,12 @@ function getVideoDetail(url, privacyMode) {
             title: idMap.get(cur + 't'),
             url: $('#noLoading#').lazyRule((u) => {
                 setItem('videoUrl', u);
+                setItem('sign', '1');
                 refreshPage();
                 return 'hiker://empty';
             }, idMap.get(cur)),
             img: idMap.get(cur + 'i'),
-            desc: idMap.get(cur + 'a') + idMap.get(cur + 'd'),
+            desc: idMap.get(cur + 'a') + '\n' + idMap.get(cur + 'd'),
             col_type: 'movie_1_left_pic'
         })
     })
