@@ -2,7 +2,7 @@ function yanzhengd(d, str, url, host, a, ua) {
     d.push({
         title: '人机验证',
         url: $('hiker://empty').rule((str, url, t, a, ua) => {
-            var d = [];
+            let d = [];
             d.push({
                 col_type: 'x5_webview_single',
                 url: url,
@@ -13,7 +13,7 @@ function yanzhengd(d, str, url, host, a, ua) {
                     js: $.toString((str, url, t, a, ua) => {
                         function check() {
                             let nodes = document.querySelectorAll(str);
-                            var co = fba.getCookie(url);
+                            let co = fba.getCookie(url);
                             fba.log(co);
                             let condition;
                             if (a) {
