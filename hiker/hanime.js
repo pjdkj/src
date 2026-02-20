@@ -180,34 +180,21 @@ function homePage() {
     let duration1 = params[getItem('duration', '全部')];
     let page = getItem('page', '1') == '1' ? '' : '&page=' + getItem('page', '1');
     let url = host + `/search?query=${query1}&type=video&genre=${genre1}${broad1}${tags1}&sort=${sort1}&date=${date1}&duration=${duration1}${page}`;
-    log(url);
+    //log(url);
     let layout_style = 'movie_2';
 
-    //let jx1 = getItem('jx', '主页');
-    //let url = urls[jx1];
-    //let select = '';
-    //if (jx1 != '主页') {
-    //    if (jx1 == '最新精选') {
-    //        url = url + '?page=' + getItem('p', '1');
-    //    } else {
-    //        url = url + '&page=' + getItem('p', '1');
-    //    }
-    //    select = '.videoList&&li[data-video-id]';
-    //} else {
-    //    select = '#singleFeedSection&&li[data-video-id]';
-    //}
-    //let res = fetch(url);
-    //pdfa(res, select).forEach(function (li) {
-    //    try {
-    //        layouts.push({
-    //            title: pdfh(li, '.title&&Text'),
-    //            img: pdfh(li, 'img&&data-path') + '@headers={"Referer":"https://cn.pornhub.com/"}',
-    //            desc: pdfh(li, '.views&&Text'),
-    //            url: 'https://cn.pornhub.com' + pdfh(li, '.title&&a&&href') + privacyMode,
-    //            col_type: layout_style
-    //        });
-    //    } catch (e) { }
-    //});
+    let res = fetch(url);
+    pdfa(res, '.horizontal-row--.video-item-container,0--.video-item-container,0&&.video-item-container').forEach(function (li) {
+        try {
+            layouts.push({
+                title: pdfh(li, '.subtitle&&Text'),
+                img: pdfh(li, 'img&&src'),
+                desc: pdfh(li, '.duration&&Text') + '&' + pdfh(li, '.stat-item&&Text'),
+                url: pdfh(li, 'a,0&&href') + privacyMode,
+                col_type: layout_style
+            });
+        } catch (e) { }
+    });
 
     layouts.push(
         {
@@ -227,7 +214,7 @@ function homePage() {
             col_type: 'text_3',
         },
         {
-            title: '自选页',
+            title: getItem('p', '1') + ' / ' + pdfh(res, '.pagination&&.page-item,-2&&Text'),
             url: $('', '页数').input(() => {
                 let p = parseInt(input.trim());
                 if (!isNaN(p)) {
