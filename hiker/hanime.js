@@ -579,12 +579,13 @@ function getVideoDetail(url, privacyMode) {
         relatedURLS.forEach((cur) => {
             layouts.push({
                 title: idMap.get(cur) == url ? '““””' + colorFont('#45DB5E', idMap.get(cur + 't')) : idMap.get(cur + 't'),
-                url: $('#noLoading#').lazyRule((u) => {
+                url: $('#noLoading#').lazyRule((u, t) => {
+                    setPageTitle(t);
                     setItem('videoUrl', u);
                     setItem('sign', '1');
                     refreshPage();
                     return 'hiker://empty';
-                }, idMap.get(cur)),
+                }, idMap.get(cur), idMap.get(cur + 't')),
                 img: idMap.get(cur + 'i'),
                 desc: idMap.get(cur + 'a') + '\n' + idMap.get(cur + 'd'),
                 col_type: 'movie_1_left_pic'
