@@ -518,19 +518,13 @@ function getVideoDetail(url, privacyMode) {
         desc: '0',
         col_type: 'card_pic_1'
     })
-    layouts.push(
-        {
-            title: big(pdfh(res, 'h3&&Text')),
+    layouts.push({
+            title: big(pdfh(res, 'h3&&Text')) + '<br>' + pdfh(res, 'h3+div&&Text'),
             col_type: 'rich_text'
-        },
-        {
-            title: pdfh(res, 'h3+div&&Text'),
-            col_type: 'rich_text'
-        }
-    )
+    })
     layouts.push({
         title: pdfh(res, '#video-user-avatar&&alt'),
-        img: pdfh(res, '#video-user-avatar&&src'),
+        img: pdfh(res, '#video-user-avatar&&src') + '@headers={"Accept":"image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8"}',
         col_type: 'avatar'
     })
     layouts.push({
