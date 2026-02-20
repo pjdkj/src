@@ -170,7 +170,7 @@ function homePage() {
         "1991年": "1991+年+",
         "1990年": "1990+年+"
     };
-    
+
     let query1 = getItem('query', '');
     let broad1 = getItem('broad', '') == 'on' ? '&broad=on' : '';
     let tags1 = getItem('tags', '') == '' ? '' : getItem('tags', '');
@@ -180,22 +180,23 @@ function homePage() {
     let duration1 = params[getItem('duration', '全部')];
     let page = getItem('page', '1') == '1' ? '' : '&page=' + getItem('page', '1');
     let url = host + `/search?query=${query1}&type=video&genre=${genre1}${broad1}${tags1}&sort=${sort1}&date=${date1}&duration=${duration1}${page}`;
-    //log(url);
+    log(url);
     let layout_style = 'movie_2';
 
     let res = fetch(url);
-    pdfa(res, '.horizontal-row--.video-item-container,0--.video-item-container,0&&.video-item-container').forEach(function (li) {
-        try {
-            layouts.push({
-                title: pdfh(li, '.subtitle&&Text'),
-                img: pdfh(li, 'img&&src'),
-                desc: pdfh(li, '.stat-item,1&&Text'),
-                url: pdfh(li, 'a,0&&href') + privacyMode,
-                col_type: layout_style
-            });
-        } catch (e) { }
-    });
-
+    try {
+        pdfa(res, '.horizontal-row--.video-item-container,0--.video-item-container,0&&.video-item-container').forEach(function (li) {
+            try {
+                layouts.push({
+                    title: pdfh(li, '.title&&Text'),
+                    img: pdfh(li, 'img&&src'),
+                    desc: pdfh(li, '.stat-item,1&&Text'),
+                    url: pdfh(li, 'a,0&&href') + privacyMode,
+                    col_type: layout_style
+                });
+            } catch (e) { log(e) }
+        });
+    } catch (e) { log(e) }
     layouts.push(
         {
             col_type: 'blank_block',
@@ -485,4 +486,8 @@ function setTags(params, iconHost) {
         })
     });
     return layouts
+}
+function getVideoDetail(url, privacyMode) {
+    let res = fetch(url + privacyMode);
+
 }
