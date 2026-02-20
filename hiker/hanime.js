@@ -536,49 +536,49 @@ function getVideoDetail(url, privacyMode) {
         })
     })
 
-    const idMap = new Map();
-    let relatedVideo = pdfa(res, '#playlist-scroll&&.related-watch-wrap');
-    relatedVideo.forEach((cur) => {
-        let url = pdfh(cur, 'a,0&&href');
-        const match = url.match(/v=(\d+)/)[1];
-        if (match) {
-            const id = parseInt(match, 10);
-            idMap.set(id, url);
-            idMap.set(id + 't', pdfh(cur, '.card-mobile-title&&Text'));
-            idMap.set(id + 'i', pdfh(cur, 'img,1&&src'));
-            idMap.set(id + 'a', pdfh(cur, '.card-mobile-genre-wrapper&&a&&Text'));
-            idMap.set(id + 'd', pdfh(cur, '.card-mobile-duration,-1&&Text'));
-        }
-    })
-    let startId = parseInt(url.match(/v=(\d+)/)[1]);
+    //const idMap = new Map();
+    //let relatedVideo = pdfa(res, '#playlist-scroll&&.related-watch-wrap');
+    //relatedVideo.forEach((cur) => {
+    //    let url = pdfh(cur, 'a,0&&href');
+    //    const match = url.match(/v=(\d+)/)[1];
+    //    if (match) {
+    //        const id = parseInt(match, 10);
+    //        idMap.set(id, url);
+    //        idMap.set(id + 't', pdfh(cur, '.card-mobile-title&&Text'));
+    //        idMap.set(id + 'i', pdfh(cur, 'img,1&&src'));
+    //        idMap.set(id + 'a', pdfh(cur, '.card-mobile-genre-wrapper&&a&&Text'));
+    //        idMap.set(id + 'd', pdfh(cur, '.card-mobile-duration,-1&&Text'));
+    //    }
+    //})
+    //let startId = parseInt(url.match(/v=(\d+)/)[1]);
 
-    const resultIds = new Set();
-    resultIds.add(startId);
+    //const resultIds = new Set();
+    //resultIds.add(startId);
 
-    let left = startId - 1;
-    while (idMap.has(left)) {
-        resultIds.add(left);
-        left--;
-    }
+    //let left = startId - 1;
+    //while (idMap.has(left)) {
+    //    resultIds.add(left);
+    //    left--;
+    //}
 
-    let right = startId + 1;
-    while (idMap.has(right)) {
-        resultIds.add(right);
-        right++;
-    }
+    //let right = startId + 1;
+    //while (idMap.has(right)) {
+    //    resultIds.add(right);
+    //    right++;
+    //}
 
-    let relatedURLS = Array.from(resultIds).sort((a, b) => a - b);
-    relatedURLS.forEach((cur) => {
-        layouts.push({
-            title: idMap.get(cur + 't'),
-            url: $.toString(() => {
-                setItem('videoUrl', idMap.get(cur));
-                refreshPage();
-            }),
-            img: idMap.get(cur + 'i'),
-            desc: idMap.get(cur + 'a') + idMap.get(cur + 'd'),
-        })
-    })
+    //let relatedURLS = Array.from(resultIds).sort((a, b) => a - b);
+    //relatedURLS.forEach((cur) => {
+    //    layouts.push({
+    //        title: idMap.get(cur + 't'),
+    //        url: $.toString(() => {
+    //            setItem('videoUrl', idMap.get(cur));
+    //            refreshPage();
+    //        }),
+    //        img: idMap.get(cur + 'i'),
+    //        desc: idMap.get(cur + 'a') + idMap.get(cur + 'd'),
+    //    })
+    //})
     
     return layouts
 }
