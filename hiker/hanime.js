@@ -537,7 +537,7 @@ function getVideoDetail(url, privacyMode) {
     })
     urls.forEach((cur) => {
         layouts.push({
-            title: cur.match(/\d+-(\d+)p/)[1] + 'p',
+            title: cur.match(/\/\d+[^\d]+(\d+)p/)[1] + 'p',
             url: cur,
             col_type: 'flex_button'
         })
