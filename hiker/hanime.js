@@ -526,6 +526,7 @@ function getVideoDetail(url, privacyMode) {
     })
     layouts.push({
         title: '画质：',
+        url: '',
         col_type: 'flex_button'
     })
     urls.forEach((cur) => {
@@ -536,21 +537,21 @@ function getVideoDetail(url, privacyMode) {
         })
     })
 
-    //const idMap = new Map();
-    //let relatedVideo = pdfa(res, '#playlist-scroll&&.related-watch-wrap');
-    //relatedVideo.forEach((cur) => {
-    //    let url = pdfh(cur, 'a,0&&href');
-    //    const match = url.match(/v=(\d+)/)[1];
-    //    if (match) {
-    //        const id = parseInt(match, 10);
-    //        idMap.set(id, url);
-    //        idMap.set(id + 't', pdfh(cur, '.card-mobile-title&&Text'));
-    //        idMap.set(id + 'i', pdfh(cur, 'img,1&&src'));
-    //        idMap.set(id + 'a', pdfh(cur, '.card-mobile-genre-wrapper&&a&&Text'));
-    //        idMap.set(id + 'd', pdfh(cur, '.card-mobile-duration,-1&&Text'));
-    //    }
-    //})
-    //let startId = parseInt(url.match(/v=(\d+)/)[1]);
+    const idMap = new Map();
+    let relatedVideo = pdfa(res, '#playlist-scroll&&.related-watch-wrap');
+    relatedVideo.forEach((cur) => {
+        let url = pdfh(cur, 'a,0&&href');
+        const match = url.match(/v=(\d+)/)[1];
+        if (match) {
+            const id = parseInt(match, 10);
+            idMap.set(id, url);
+            idMap.set(id + 't', pdfh(cur, '.card-mobile-title&&Text'));
+            idMap.set(id + 'i', pdfh(cur, 'img,1&&src'));
+            idMap.set(id + 'a', pdfh(cur, '.card-mobile-genre-wrapper&&a&&Text'));
+            idMap.set(id + 'd', pdfh(cur, '.card-mobile-duration,-1&&Text'));
+        }
+    })
+    let startId = parseInt(url.match(/v=(\d+)/)[1]);
 
     //const resultIds = new Set();
     //resultIds.add(startId);
