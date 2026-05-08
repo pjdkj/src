@@ -110,7 +110,10 @@ function homePage() {
                 title: pdfh(li, '.title&&Text'),
                 img: pdfh(li, 'img&&data-path') + '@headers={"Referer":"https://cn.pornhub.com/"}',
                 desc: pdfh(li, '.views&&Text'),
-                url: 'https://cn.pornhub.com' + pdfh(li, '.title&&a&&href') + privacyMode,
+                url: $('https://cn.pornhub.com' + pdfh(li, '.title&&a&&href') + privacyMode).rule(() => {
+                require(config.依赖);
+                setResult(getVideoDetials(input));
+            }),
                 col_type: layout_style
             });
         } catch (e) { }
@@ -249,7 +252,10 @@ function searchVideo(key, page) {
                 title: pdfh(li, '.title&&Text'),
                 img: pdfh(li, 'img&&data-path') + '@headers={"Referer":"https://cn.pornhub.com/"}',
                 desc: pdfh(li, '.videoViews&&Text') + '次观看',
-                url: 'https://cn.pornhub.com' + pdfh(li, '.title&&a&&href') + privacyMode,
+                url: $('https://cn.pornhub.com' + pdfh(li, '.title&&a&&href') + privacyMode).rule(() => {
+                require(config.依赖);
+                setResult(getVideoDetials(input));
+            }),
                 col_type: layout_style,
             });
         } catch (e) { }
@@ -356,7 +362,10 @@ function getStarDetails(link, page) {
                 title: pdfh(li, '.title&&Text'),
                 img: pdfh(li, 'img&&data-path') + '@headers={"Referer":"https://cn.pornhub.com/"}',
                 desc: pdfh(li, '.views&&Text'),
-                url: 'https://cn.pornhub.com' + pdfh(li, '.title&&a&&href') + privacyMode,
+                url: $('https://cn.pornhub.com' + pdfh(li, '.title&&a&&href') + privacyMode).rule(() => {
+                require(config.依赖);
+                setResult(getVideoDetials(input));
+            }),
                 col_type: layout_style,
             });
         } catch (e) { }
@@ -442,7 +451,10 @@ function getCategoryDetails(link, page) {
                 title: pdfh(li, '.title&&Text'),
                 img: pdfh(li, 'img&&data-path') + '@headers={"Referer":"https://cn.pornhub.com/"}',
                 desc: pdfh(li, '.views&&Text'),
-                url: 'https://cn.pornhub.com' + pdfh(li, '.title&&a&&href') + privacyMode,
+                url: $('https://cn.pornhub.com' + pdfh(li, '.title&&a&&href') + privacyMode).rule(() => {
+                require(config.依赖);
+                setResult(getVideoDetials(input));
+            }),
                 col_type: layout_style,
             });
         } catch (e) { }
@@ -631,4 +643,80 @@ function b(e) {
 }
 function br() {
     return '<br>'
+}
+
+function extractFromFlashvars(html) {
+    const videoUrls = [];
+    const videoUrlSet = new Set();
+    const flashvarsMatch = html.match(/var\s+flashvars_\d+\s*=\s*({.+?});/);
+    if (!flashvarsMatch) return videoUrls;
+    let flashvars;
+    try {
+        flashvars = JSON.parse(flashvarsMatch[1]);
+    } catch (e) {
+        return videoUrls;
+    }
+    const mediaDefinitions = flashvars.mediaDefinitions;
+    if (!Array.isArray(mediaDefinitions)) return videoUrls;
+    for (const definition of mediaDefinitions) {
+        if (typeof definition !== 'object' || definition === null) continue;
+        const videoUrl = definition.videoUrl;
+        if (!videoUrl || typeof videoUrl !== 'string') continue;
+        if (videoUrlSet.has(videoUrl)) continue;
+        videoUrlSet.add(videoUrl);
+        const quality = definition.quality ? parseInt(definition.quality, 10) : null;
+        videoUrls.push({ url: videoUrl, quality: quality });
+    }
+    return videoUrls;
+}
+
+function getVideoDetials(url) {
+    let layouts = [];
+    let privacyMode = getItem('privacyMode', '#noHistory##noRecordHistory#');
+    let fetchUrl = url.replace(/#noHistory#/g, '').replace(/#noRecordHistory#/g, '');
+
+    let html;
+    try {
+        html = fetch(fetchUrl, {});
+    } catch (e) {
+        layouts.push({ title: '页面加载失败', col_type: 'text_center_1' });
+        layouts.push({ title: '用浏览器打开', url: 'web://' + fetchUrl, col_type: 'text_3' });
+        return layouts;
+    }
+
+    let poster = pdfh(html, 'video&&poster')
+        || pdfh(html, 'meta[property="og:image"]&&content')
+        || pdfh(html, 'meta[name="twitter:image"]&&content');
+    if (poster) {
+        layouts.push({
+            img: poster + '@headers={"Referer":"https://cn.pornhub.com/"}',
+            col_type: 'card_pic_1',
+        });
+    }
+
+    let title = pdfh(html, 'meta[property="og:title"]&&content')
+        || pdfh(html, 'h1&&Text')
+        || pdfh(html, 'title&&Text');
+    if (title) {
+        layouts.push({ title: title, col_type: 'text_center_1' });
+    }
+
+    let videoUrls = extractFromFlashvars(html);
+    if (videoUrls.length === 0) {
+        layouts.push({ title: '暂无可解析的视频源', col_type: 'text_1' });
+        layouts.push({ title: '网页嗅探播放', url: 'video://' + fetchUrl, col_type: 'text_3' });
+        layouts.push({ title: '用浏览器打开', url: 'web://' + fetchUrl, col_type: 'text_3' });
+    } else {
+        videoUrls.sort((a, b) => (b.quality || 0) - (a.quality || 0));
+        for (let i = 0; i < videoUrls.length; i++) {
+            let v = videoUrls[i];
+            let label = v.quality ? v.quality + 'p' : '线路 ' + (i + 1);
+            layouts.push({
+                title: '播放 ' + label,
+                url: v.url + '#isVideo=true#' + privacyMode,
+                col_type: 'text_3',
+            });
+        }
+    }
+    return layouts;
 }
