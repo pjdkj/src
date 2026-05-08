@@ -663,6 +663,8 @@ function extractFromFlashvars(html) {
         if (typeof definition !== 'object' || definition === null) continue;
         var videoUrl = definition.videoUrl;
         if (!videoUrl || typeof videoUrl !== 'string') continue;
+        if (videoUrl.indexOf('http') !== 0) continue;
+        if (definition.format && definition.format !== 'mp4') continue;
         if (addedUrls[videoUrl]) continue;
         addedUrls[videoUrl] = true;
         var quality = definition.quality ? parseInt(definition.quality, 10) : null;
@@ -688,12 +690,19 @@ function getVideoDetials(url) {
     let poster = pdfh(html, 'video&&poster')
         || pdfh(html, 'meta[property="og:image"]&&content')
         || pdfh(html, 'meta[name="twitter:image"]&&content');
+    let videoUrls = extractFromFlashvars(html);
+
     if (poster) {
-        layouts.push({
+        var posterItem = {
             img: poster + '@headers={"Referer":"https://cn.pornhub.com/"}',
             desc: '0',
             col_type: 'card_pic_1',
-        });
+        };
+        if (videoUrls.length > 0) {
+            videoUrls.sort(function (a, b) { return (b.quality || 0) - (a.quality || 0); });
+            posterItem.url = videoUrls[0].url + ';{Referer@https://cn.pornhub.com/}' + '#isVideo=true#' + privacyMode;
+        }
+        layouts.push(posterItem);
     }
 
     let title = pdfh(html, 'meta[property="og:title"]&&content')
@@ -703,13 +712,11 @@ function getVideoDetials(url) {
         layouts.push({ title: title, col_type: 'text_center_1' });
     }
 
-    let videoUrls = extractFromFlashvars(html);
     if (videoUrls.length === 0) {
         layouts.push({ title: '暂无可解析的视频源', col_type: 'text_1' });
         layouts.push({ title: '网页嗅探播放', url: 'video://' + fetchUrl, col_type: 'text_3' });
         layouts.push({ title: '用浏览器打开', url: 'web://' + fetchUrl, col_type: 'text_3' });
     } else {
-        videoUrls.sort((a, b) => (b.quality || 0) - (a.quality || 0));
         for (let i = 0; i < videoUrls.length; i++) {
             let v = videoUrls[i];
             let label = v.quality ? v.quality + 'p' : '线路 ' + (i + 1);
