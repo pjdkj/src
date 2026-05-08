@@ -646,25 +646,26 @@ function br() {
 }
 
 function extractFromFlashvars(html) {
-    const videoUrls = [];
-    const videoUrlSet = new Set();
-    const flashvarsMatch = html.match(/var\s+flashvars_\d+\s*=\s*({.+?});/);
+    var videoUrls = [];
+    var addedUrls = {};
+    var flashvarsMatch = html.match(/var\s+flashvars_\d+\s*=\s*({.+?});/);
     if (!flashvarsMatch) return videoUrls;
-    let flashvars;
+    var flashvars;
     try {
         flashvars = JSON.parse(flashvarsMatch[1]);
     } catch (e) {
         return videoUrls;
     }
-    const mediaDefinitions = flashvars.mediaDefinitions;
-    if (!Array.isArray(mediaDefinitions)) return videoUrls;
-    for (const definition of mediaDefinitions) {
+    var mediaDefinitions = flashvars.mediaDefinitions;
+    if (!mediaDefinitions || typeof mediaDefinitions.length !== 'number') return videoUrls;
+    for (var i = 0; i < mediaDefinitions.length; i++) {
+        var definition = mediaDefinitions[i];
         if (typeof definition !== 'object' || definition === null) continue;
-        const videoUrl = definition.videoUrl;
+        var videoUrl = definition.videoUrl;
         if (!videoUrl || typeof videoUrl !== 'string') continue;
-        if (videoUrlSet.has(videoUrl)) continue;
-        videoUrlSet.add(videoUrl);
-        const quality = definition.quality ? parseInt(definition.quality, 10) : null;
+        if (addedUrls[videoUrl]) continue;
+        addedUrls[videoUrl] = true;
+        var quality = definition.quality ? parseInt(definition.quality, 10) : null;
         videoUrls.push({ url: videoUrl, quality: quality });
     }
     return videoUrls;
