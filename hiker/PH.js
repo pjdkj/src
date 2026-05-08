@@ -110,10 +110,10 @@ function homePage() {
                 title: pdfh(li, '.title&&Text'),
                 img: pdfh(li, 'img&&data-path') + '@headers={"Referer":"https://cn.pornhub.com/"}',
                 desc: pdfh(li, '.views&&Text'),
-                url: $('https://cn.pornhub.com' + pdfh(li, '.title&&a&&href') + privacyMode).rule(() => {
+                url: $('hiker://empty' + privacyMode).rule((url) => {
                 require(config.依赖);
-                setResult(getVideoDetials(input));
-            }),
+                setResult(getVideoDetials(url));
+            }, 'https://cn.pornhub.com' + pdfh(li, '.title&&a&&href') + privacyMode),
                 col_type: layout_style
             });
         } catch (e) { }
@@ -252,10 +252,10 @@ function searchVideo(key, page) {
                 title: pdfh(li, '.title&&Text'),
                 img: pdfh(li, 'img&&data-path') + '@headers={"Referer":"https://cn.pornhub.com/"}',
                 desc: pdfh(li, '.videoViews&&Text') + '次观看',
-                url: $('https://cn.pornhub.com' + pdfh(li, '.title&&a&&href') + privacyMode).rule(() => {
+                url: $('hiker://empty' + privacyMode).rule((url) => {
                 require(config.依赖);
-                setResult(getVideoDetials(input));
-            }),
+                setResult(getVideoDetials(url));
+            }, 'https://cn.pornhub.com' + pdfh(li, '.title&&a&&href') + privacyMode),
                 col_type: layout_style,
             });
         } catch (e) { }
@@ -362,10 +362,10 @@ function getStarDetails(link, page) {
                 title: pdfh(li, '.title&&Text'),
                 img: pdfh(li, 'img&&data-path') + '@headers={"Referer":"https://cn.pornhub.com/"}',
                 desc: pdfh(li, '.views&&Text'),
-                url: $('https://cn.pornhub.com' + pdfh(li, '.title&&a&&href') + privacyMode).rule(() => {
+                url: $('hiker://empty' + privacyMode).rule((url) => {
                 require(config.依赖);
-                setResult(getVideoDetials(input));
-            }),
+                setResult(getVideoDetials(url));
+            }, 'https://cn.pornhub.com' + pdfh(li, '.title&&a&&href') + privacyMode),
                 col_type: layout_style,
             });
         } catch (e) { }
@@ -451,10 +451,10 @@ function getCategoryDetails(link, page) {
                 title: pdfh(li, '.title&&Text'),
                 img: pdfh(li, 'img&&data-path') + '@headers={"Referer":"https://cn.pornhub.com/"}',
                 desc: pdfh(li, '.views&&Text'),
-                url: $('https://cn.pornhub.com' + pdfh(li, '.title&&a&&href') + privacyMode).rule(() => {
+                url: $('hiker://empty' + privacyMode).rule((url) => {
                 require(config.依赖);
-                setResult(getVideoDetials(input));
-            }),
+                setResult(getVideoDetials(url));
+            }, 'https://cn.pornhub.com' + pdfh(li, '.title&&a&&href') + privacyMode),
                 col_type: layout_style,
             });
         } catch (e) { }
