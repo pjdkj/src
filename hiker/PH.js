@@ -663,8 +663,7 @@ function extractFromFlashvars(html) {
         if (typeof definition !== 'object' || definition === null) continue;
         var videoUrl = definition.videoUrl;
         if (!videoUrl || typeof videoUrl !== 'string') continue;
-        if (videoUrl.indexOf('http') !== 0) continue;
-        if (definition.format && definition.format !== 'mp4') continue;
+        if (videoUrl.indexOf('master.m3u8') === -1) continue;
         if (addedUrls[videoUrl]) continue;
         addedUrls[videoUrl] = true;
         var quality = definition.quality ? parseInt(definition.quality, 10) : null;
