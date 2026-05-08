@@ -691,6 +691,7 @@ function getVideoDetials(url) {
     if (poster) {
         layouts.push({
             img: poster + '@headers={"Referer":"https://cn.pornhub.com/"}',
+            desc: '0',
             col_type: 'card_pic_1',
         });
     }
@@ -714,7 +715,7 @@ function getVideoDetials(url) {
             let label = v.quality ? v.quality + 'p' : '线路 ' + (i + 1);
             layouts.push({
                 title: '播放 ' + label,
-                url: v.url + '#isVideo=true#' + privacyMode,
+                url: v.url + ';{Referer@https://cn.pornhub.com/}' + '#isVideo=true#' + privacyMode,
                 col_type: 'text_3',
             });
         }
