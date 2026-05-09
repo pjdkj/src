@@ -788,7 +788,7 @@ function danyeHtml(imgSrc, viewer, tag, style) {
     }
 
     const imgArr = list.reduce((acc, url) => {
-        acc.push(`<li><img data-src="${url}" alt="图片"></li>`);
+        acc.push(`<li><img data-src="${url}" alt="图片" decoding="async"></li>`);
         return acc;
     }, []);
 
@@ -885,157 +885,186 @@ function danyeHtml(imgSrc, viewer, tag, style) {
     <ul class="gallery">
         ${imgTags}
     </ul>
-    <div id="load-finish">已加载全部内容</div>
+    <div id="load-finish">加载中...</div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/viewerjs/1.10.0/viewer.min.js"></script>
     <script>
         const CONFIG = {
             retry: { maxAttempts: 3, initialDelay: 1000, backoff: 2 },
             viewer: ${viewer},
             viewerParams: { toolbar: { zoomIn: 1, zoomOut: 1, oneToOne: 1, reset: 1 }, transition: false, navbar: false, title: false },
-            load: { concurrency: 3, batchDelay: 300 }
+            imageLoad: {
+                batchSize: 5,
+                viewportFirst: true,
+                cache: true
+            }
         };
 
-        // Viewer实例管理 - 优化更新频率
+        const imageAbortControllers = new Map();
+
+        /* --- Viewer 管理 --- */
         const viewerManager = {
             instance: null,
-            updateTimer: null,
+            timer: null,
+            firstUpdate: true,
             init() {
                 if (this.instance) return;
                 this.instance = new Viewer(document.querySelector('.gallery'), {
                     ...CONFIG.viewerParams,
                     url: 'data-src'
                 });
+                this.firstUpdate = true;
             },
             update() {
-                if (!this.instance) return; 
-                if (this.updateTimer) clearTimeout(this.updateTimer);
-                this.updateTimer = setTimeout(() => {
+                if (!this.instance) return;
+                clearTimeout(this.timer);
+                const delay = this.firstUpdate ? 0 : 100;
+                this.firstUpdate = false;
+                this.timer = setTimeout(() => {
                     this.instance?.update();
-                    this.updateTimer = null;
-                }, 100);
+                }, delay);
             },
             destroy() {
-                if (this.instance) {
-                    try {
-                        this.instance.destroy();
-                        document.querySelectorAll('.viewer-container').forEach(container => container.remove());
-                    } catch (e) {
-                        console.error('Viewer销毁失败:', e);
-                    }
-                    this.instance = null;
-                }
+                clearTimeout(this.timer);
+                this.instance?.destroy();
+                this.instance = null;
+                imageAbortControllers.forEach(controller => controller.abort());
+                imageAbortControllers.clear();
             }
         };
 
-        // 图片加载控制
+        /* --- 图片加载器 --- */
         const imageLoader = {
-            loadingCount: 0, // 当前加载中的图片数
-            imageQueue: [],  // 待加载图片队列
+            async loadImagesInOrder(imgs) {
+                if (!imgs.length) return;
 
-            // 初始化加载队列
-            initQueue() {
-                this.imageQueue = Array.from(document.querySelectorAll('.gallery img'));
-                // 启动并发加载
-                this.loadNextBatch();
+                const [viewportImgs, otherImgs] = CONFIG.imageLoad.viewportFirst
+                    ? this.splitViewportImages(imgs)
+                    : [[], imgs];
+
+                const viewportTask = this.loadImageBatch(viewportImgs);
+                if (!otherImgs.length) { await viewportTask; return; }
+
+                const remainingTask = new Promise(resolve =>
+                    setTimeout(resolve, 30)
+                ).then(async () => {
+                    for (let i = 0; i < otherImgs.length; i += CONFIG.imageLoad.batchSize) {
+                        await this.loadImageBatch(otherImgs.slice(i, i + CONFIG.imageLoad.batchSize));
+                    }
+                });
+
+                await Promise.allSettled([viewportTask, remainingTask]);
             },
 
-            // 加载下一批图片
-            loadNextBatch() {
-                // 还有待加载图片 && 当前加载数 < 最大并发数
-                while (this.imageQueue.length > 0 && this.loadingCount < CONFIG.load.concurrency) {
-                    const img = this.imageQueue.shift();
-                    this.loadImage(img);
-                }
+            async loadImageBatch(imgs) {
+                if (!imgs.length) return Promise.resolve();
+                const promises = imgs.map(img => this.loadImage(img));
+                await Promise.allSettled(promises);
             },
 
-            // 单张图片加载逻辑
-            loadImage(img, attempt = 1) {
-                // 防止重复加载
-                if (img.hasAttribute('loading') || img.src || img.parentElement.classList.contains('error')) {
-                    this.loadingCount--;
-                    this.loadNextBatch();
+            splitViewportImages(imgs) {
+                const viewportImgs = [];
+                const otherImgs = [];
+                const viewportHeight = window.innerHeight;
+
+                imgs.forEach(img => {
+                    const rect = img.getBoundingClientRect();
+                    const isInViewport = rect.top < viewportHeight + 200 && rect.bottom > -200;
+                    isInViewport ? viewportImgs.push(img) : otherImgs.push(img);
+                });
+                return [viewportImgs, otherImgs];
+            },
+
+            loadImage(img) {
+                if (img.hasAttribute('loaded') || img.parentElement.classList.contains('error')) return Promise.resolve();
+                if (img.hasAttribute('loading')) return new Promise(resolve => {
+                    const onLoad = () => { resolve(); img.removeEventListener('load', onLoad); };
+                    const onError = () => { resolve(); img.removeEventListener('error', onError); };
+                    img.addEventListener('load', onLoad);
+                    img.addEventListener('error', onError);
+                });
+
+                img.setAttribute('loading', '');
+                const attempt = parseInt(img.dataset.retryAttempt || 1);
+                const controller = new AbortController();
+                const signal = controller.signal;
+                imageAbortControllers.set(img, controller);
+
+                return new Promise((resolve) => {
+                    const src = CONFIG.imageLoad.cache && attempt === 1
+                        ? img.dataset.src
+                        : img.dataset.src + '?t=' + Date.now();
+
+                    const tempImg = new Image();
+
+                    tempImg.onload = () => {
+                        imageAbortControllers.delete(img);
+                        this.handleSuccess(img, tempImg);
+                        resolve();
+                    };
+
+                    tempImg.onerror = () => {
+                        this.handleError(img, attempt).then(resolve).catch(resolve);
+                        imageAbortControllers.delete(img);
+                    };
+
+                    signal.addEventListener('abort', () => {
+                        imageAbortControllers.delete(img);
+                        img.removeAttribute('loading');
+                        resolve();
+                    });
+
+                    const timeoutId = setTimeout(() => {
+                        tempImg.onload = null;
+                        tempImg.onerror = null;
+                        this.handleError(img, attempt).then(resolve).catch(resolve);
+                    }, 15000);
+
+                    const cleanup = () => clearTimeout(timeoutId);
+                    tempImg.addEventListener('load', cleanup, { once: true });
+                    tempImg.addEventListener('error', cleanup, { once: true });
+                    signal.addEventListener('abort', cleanup, { once: true });
+
+                    tempImg.src = src;
+                });
+            },
+
+            handleSuccess(img, tempImg) {
+                if (!viewerManager.instance) return;
+                img.removeAttribute('loading');
+                const aspectRatio = tempImg.naturalWidth / tempImg.naturalHeight;
+                img.parentElement.style.setProperty('--aspect-ratio', aspectRatio);
+                img.src = tempImg.src;
+                img.setAttribute('loaded', '');
+                viewerManager.update();
+            },
+
+            async handleError(img, attempt) {
+                img.removeAttribute('loading');
+                if (attempt >= CONFIG.retry.maxAttempts) {
+                    img.parentElement.classList.add('error');
+                    img.alt = '图片加载失败';
+                    viewerManager.update();
                     return;
                 }
 
-                img.setAttribute('loading', '');
-                this.loadingCount++;
+                img.dataset.retryAttempt = attempt + 1;
+                const delay = CONFIG.retry.initialDelay * Math.pow(CONFIG.retry.backoff, attempt - 1);
 
-                const src = img.dataset.src;
-                const tempImg = new Image();
-
-                tempImg.onload = () => {
-                    // 提前计算宽高比，减少布局闪烁
-                    const aspectRatio = tempImg.naturalWidth / tempImg.naturalHeight;
-                    img.parentElement.style.setProperty('--aspect-ratio', aspectRatio);
-
-                    img.src = src;
-                    img.setAttribute('loaded', '');
-                    img.removeAttribute('loading');
-
-                    this.loadingCount--;
-                    this.scheduleViewerUpdate();
-
-                    // 延迟加载下一批，避免瞬间请求
-                    setTimeout(() => {
-                        this.loadNextBatch();
-                    }, CONFIG.load.batchDelay);
-                };
-
-                tempImg.onerror = () => {
-                    img.removeAttribute('loading');
-                    this.handleError(img, attempt);
-                };
-
-                // 超时处理
-                tempImg.timeoutId = setTimeout(() => {
-                    tempImg.onerror();
-                }, 10000); // 10秒超时
-
-                tempImg.src = src;
-            },
-
-            // 错误处理
-            handleError(img, attempt) {
-                this.loadingCount--;
-
-                // 重试次数未达上限
-                if (attempt < CONFIG.retry.maxAttempts) {
-                    const delay = CONFIG.retry.initialDelay * Math.pow(CONFIG.retry.backoff, attempt - 1);
-                    setTimeout(() => {
-                        // 重新加入队列末尾
-                        this.imageQueue.push(img);
-                        this.loadNextBatch();
-                    }, delay);
-                } else {
-                    // 重试失败
-                    img.parentElement.classList.add('error');
-                    img.alt = '图片加载失败';
-                    this.scheduleViewerUpdate();
-                    // 加载下一张
-                    this.loadNextBatch();
-                }
-            },
-
-            scheduleViewerUpdate() {
-                viewerManager.update();
+                await new Promise(resolve => setTimeout(resolve, delay));
+                await this.loadImage(img);
             }
         };
 
-        // 页面初始化
+        /* --- 初始化 --- */
         document.addEventListener('DOMContentLoaded', () => {
             if (CONFIG.viewer) viewerManager.init();
-            imageLoader.initQueue();
+            const imgs = Array.from(document.querySelectorAll('.gallery img'));
+            imageLoader.loadImagesInOrder(imgs).then(() => {
+                document.getElementById('load-finish').textContent = '已加载全部内容';
+            });
         });
-
-        // 窗口变化时防抖更新
-        window.addEventListener('resize', () => {
-            viewerManager.update();
-        });
-
-        // 页面卸载时销毁
-        window.addEventListener('beforeunload', () => {
-            viewerManager.destroy();
-        });
+        window.addEventListener('beforeunload', () => viewerManager.destroy());
+        window.addEventListener('resize', () => viewerManager.update());
     </script>
 </body>
 </html>`;
