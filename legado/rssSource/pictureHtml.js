@@ -97,21 +97,25 @@ function duoyeHtml(config) {
         }
         //去重
         const blacklist = Object.create(null);
+        const normUrl = u => u.trim().toLowerCase().replace(/\/+$/, '');
 
         if (firstPageUrl.trim()) {
             blacklist[firstPageUrl.trim()] = true;
+            blacklist[normUrl(firstPageUrl)] = true;
         }
         if (!(!html && !firstPageUrl)) {
             blacklist[String(this.baseUrl)] = true;
+            blacklist[normUrl(String(this.baseUrl))] = true;
         }
         for (let i = 0; i < nextPageUrls.length; i++) {
             url = nextPageUrls[i];
             if (typeof url !== 'string') continue;
             url = url.trim();
             if (!url) continue;
-            if (blacklist[url]) continue;
+            if (blacklist[url] || blacklist[normUrl(url)]) continue;
 
             blacklist[url] = true;
+            blacklist[normUrl(url)] = true;
             urlList.push(url);
         }
     }
@@ -121,6 +125,7 @@ function duoyeHtml(config) {
     if (!html && !firstPageUrl) {
         firstPageUrl = urlList.length > 0 ? urlList[0] : '';
     }
+    let INITIAL_PAGE_INDEX = (!html && urlList.length > 0) ? 1 : 0;
 
     const { java, cache } = this;
     //设置主题
@@ -226,7 +231,7 @@ function duoyeHtml(config) {
             lazy: ${lazy},
             batchSize: ${batchSize},
             imageLoad: {
-                batchSize: 3, // 每批加载3张
+                batchSize: 5, // 每批加载5张
                 viewportFirst: true, // 首屏图片优先加载
                 cache: true // 启用图片缓存
             },
@@ -242,7 +247,7 @@ function duoyeHtml(config) {
         let pendingPageResolve = null;
 
         let nextPageUrlList = null;
-        let nextPageIndex = 0;
+        let nextPageIndex = ${INITIAL_PAGE_INDEX};
 
         const pageQueue = [];
         const visitedPages = new Set();
@@ -252,23 +257,28 @@ function duoyeHtml(config) {
         const viewerManager = {
             instance: null,
             timer: null,
+            firstUpdate: true,
             init() {
                 if (this.instance) return;
                 this.instance = new Viewer(document.querySelector('.gallery'), {
                     ...CONFIG.viewerParams,
                     url: 'data-src'
                 });
+                this.firstUpdate = true;
             },
             update() {
                 if (!this.instance) return;
                 clearTimeout(this.timer);
+                const delay = this.firstUpdate ? 0 : 100;
+                this.firstUpdate = false;
                 this.timer = setTimeout(() => {
                     this.instance?.update();
-                }, 100);
+                }, delay);
             },
             destroy() {
                 clearTimeout(this.timer);
                 this.instance?.destroy();
+                this.instance = null;
                 // 中断所有未完成的图片请求
                 imageAbortControllers.forEach(controller => controller.abort());
                 imageAbortControllers.clear();
@@ -281,18 +291,22 @@ function duoyeHtml(config) {
             async loadImagesInOrder(imgs) {
                 if (!imgs.length) return;
 
-                // 步骤1：分离首屏/非首屏图片
                 const [viewportImgs, otherImgs] = CONFIG.imageLoad.viewportFirst
                     ? this.splitViewportImages(imgs)
                     : [[], imgs];
 
-                // 步骤2：先加载首屏图片
-                await this.loadImageBatch(viewportImgs);
-                // 步骤3：分批加载剩余图片
-                for (let i = 0; i < otherImgs.length; i += CONFIG.imageLoad.batchSize) {
-                    const batch = otherImgs.slice(i, i + CONFIG.imageLoad.batchSize);
-                    await this.loadImageBatch(batch);
-                }
+                const viewportTask = this.loadImageBatch(viewportImgs);
+                if (!otherImgs.length) { await viewportTask; return; }
+
+                const remainingTask = new Promise(resolve =>
+                    setTimeout(resolve, 30)
+                ).then(async () => {
+                    for (let i = 0; i < otherImgs.length; i += CONFIG.imageLoad.batchSize) {
+                        await this.loadImageBatch(otherImgs.slice(i, i + CONFIG.imageLoad.batchSize));
+                    }
+                });
+
+                await Promise.allSettled([viewportTask, remainingTask]);
             },
 
             // 加载单批图片
@@ -344,7 +358,6 @@ function duoyeHtml(config) {
                         : img.dataset.src + '?t=' + Date.now();
 
                     const tempImg = new Image();
-                    tempImg.signal = signal;
 
                     tempImg.onload = () => {
                         imageAbortControllers.delete(img);
@@ -359,9 +372,21 @@ function duoyeHtml(config) {
 
                     // 监听中断信号
                     signal.addEventListener('abort', () => {
+                        imageAbortControllers.delete(img);
                         img.removeAttribute('loading');
                         resolve();
                     });
+
+                    const timeoutId = setTimeout(() => {
+                        tempImg.onload = null;
+                        tempImg.onerror = null;
+                        this.handleError(img, attempt).then(resolve).catch(resolve);
+                    }, 15000);
+
+                    const cleanup = () => clearTimeout(timeoutId);
+                    tempImg.addEventListener('load', cleanup, { once: true });
+                    tempImg.addEventListener('error', cleanup, { once: true });
+                    signal.addEventListener('abort', cleanup, { once: true });
 
                     tempImg.src = src;
                 });
@@ -369,16 +394,14 @@ function duoyeHtml(config) {
 
             // 加载成功处理
             handleSuccess(img, tempImg) {
+                if (!viewerManager.instance) return;
                 img.removeAttribute('loading');
                 // 提前计算宽高比，减少布局抖动
                 const aspectRatio = tempImg.naturalWidth / tempImg.naturalHeight;
                 img.parentElement.style.setProperty('--aspect-ratio', aspectRatio);
-                // 异步设置src，避免阻塞主线程
-                requestAnimationFrame(() => {
-                    img.src = tempImg.src;
-                    img.setAttribute('loaded', '');
-                    viewerManager.update();
-                });
+                img.src = tempImg.src;
+                img.setAttribute('loaded', '');
+                viewerManager.update();
             },
 
             // 加载失败处理（严谨的重试逻辑）
@@ -414,6 +437,7 @@ function duoyeHtml(config) {
                 const li = document.createElement('li');
                 const img = document.createElement('img');
                 img.dataset.src = src;
+                img.decoding = 'async';
                 li.appendChild(img);
                 frag.appendChild(li);
                 imgs.push(img);
@@ -551,10 +575,16 @@ function duoyeHtml(config) {
         }
         /* --- 单页加载 --- */
         async function loadSinglePage() {
-            const url = pageQueue.shift();
-            if (!url) return;
+            if (pageQueue.length === 0) return;
+            const url = pageQueue[0];
 
-            const html = await fetchPage(url);
+            let html;
+            try {
+                html = await fetchPage(url);
+            } catch (e) {
+                throw e;
+            }
+            pageQueue.shift();
             if (!html) return;
 
             const { images, nextUrl } = parsePage(html, url);
@@ -673,11 +703,14 @@ function duoyeHtml(config) {
                     }           
                 }
                 else{
-                    try {
-                        nextUrl = new URL(${JSON.stringify(SECOND_PAGE_URL)}, ${JSON.stringify(host)}).href;
-                    }catch(e) {
-                        console.error('相对链接解析失败:', e);
-                        nextUrl = null;
+                    const secondPageUrl = ${JSON.stringify(SECOND_PAGE_URL)};
+                    if (secondPageUrl) {
+                        try {
+                            nextUrl = new URL(secondPageUrl, ${JSON.stringify(host)}).href;
+                        }catch(e) {
+                            console.error('相对链接解析失败:', e);
+                            nextUrl = null;
+                        }
                     }
                 }
 
