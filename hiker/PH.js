@@ -605,7 +605,7 @@ function settingPage() {
     layouts.push(
         {
             title:
-                small(b('更新日期：2026-02-18 &nbsp;&nbsp; By &nbsp; 平静')) +
+                small(b('更新日期：2026-05-08 &nbsp;&nbsp; By &nbsp; 平静')) +
                 br() +
                 small(colorFont('#ff2700', '1.禁止转载')),
             col_type: 'rich_text',
