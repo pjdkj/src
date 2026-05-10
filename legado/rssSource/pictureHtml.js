@@ -283,6 +283,10 @@ function duoyeHtml(config) {
                 const delay = this.firstUpdate ? 0 : 100;
                 this.firstUpdate = false;
                 this.timer = setTimeout(() => {
+                    if (this.instance && this.instance.visible) {
+                        this.pendingUpdate = true;
+                        return;
+                    }
                     this.instance?.update();
                 }, delay);
             },
@@ -942,6 +946,10 @@ function danyeHtml(imgSrc, viewer, tag, style) {
                 const delay = this.firstUpdate ? 0 : 100;
                 this.firstUpdate = false;
                 this.timer = setTimeout(() => {
+                    if (this.instance && this.instance.visible) {
+                        this.pendingUpdate = true;
+                        return;
+                    }
                     this.instance?.update();
                 }, delay);
             },
