@@ -259,12 +259,14 @@ function duoyeHtml(config) {
             timer: null,
             firstUpdate: true,
             pendingUpdate: false,
+            isViewing: false,
             init() {
                 if (this.instance) return;
                 this.instance = new Viewer(document.querySelector('.gallery'), {
                     ...CONFIG.viewerParams,
                     url: 'data-src',
                     shown: () => {
+                        this.isViewing = true;
                         if (this.timer) {
                             clearTimeout(this.timer);
                             this.timer = null;
@@ -272,6 +274,7 @@ function duoyeHtml(config) {
                         }
                     },
                     hidden: () => {
+                        this.isViewing = false;
                         if (this.pendingUpdate) {
                             this.pendingUpdate = false;
                             this.update();
@@ -282,7 +285,7 @@ function duoyeHtml(config) {
             },
             update() {
                 if (!this.instance) return;
-                if (this.instance.visible) {
+                if (this.isViewing) {
                     this.pendingUpdate = true;
                     return;
                 }
@@ -290,7 +293,7 @@ function duoyeHtml(config) {
                 const delay = this.firstUpdate ? 0 : 100;
                 this.firstUpdate = false;
                 this.timer = setTimeout(() => {
-                    if (this.instance && this.instance.visible) {
+                    if (this.isViewing) {
                         this.pendingUpdate = true;
                         return;
                     }
@@ -929,12 +932,14 @@ function danyeHtml(imgSrc, viewer, tag, style) {
             timer: null,
             firstUpdate: true,
             pendingUpdate: false,
+            isViewing: false,
             init() {
                 if (this.instance) return;
                 this.instance = new Viewer(document.querySelector('.gallery'), {
                     ...CONFIG.viewerParams,
                     url: 'data-src',
                     shown: () => {
+                        this.isViewing = true;
                         if (this.timer) {
                             clearTimeout(this.timer);
                             this.timer = null;
@@ -942,6 +947,7 @@ function danyeHtml(imgSrc, viewer, tag, style) {
                         }
                     },
                     hidden: () => {
+                        this.isViewing = false;
                         if (this.pendingUpdate) {
                             this.pendingUpdate = false;
                             this.update();
@@ -952,7 +958,7 @@ function danyeHtml(imgSrc, viewer, tag, style) {
             },
             update() {
                 if (!this.instance) return;
-                if (this.instance.visible) {
+                if (this.isViewing) {
                     this.pendingUpdate = true;
                     return;
                 }
@@ -960,7 +966,7 @@ function danyeHtml(imgSrc, viewer, tag, style) {
                 const delay = this.firstUpdate ? 0 : 100;
                 this.firstUpdate = false;
                 this.timer = setTimeout(() => {
-                    if (this.instance && this.instance.visible) {
+                    if (this.isViewing) {
                         this.pendingUpdate = true;
                         return;
                     }
