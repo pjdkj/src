@@ -258,16 +258,27 @@ function duoyeHtml(config) {
             instance: null,
             timer: null,
             firstUpdate: true,
+            pendingUpdate: false,
             init() {
                 if (this.instance) return;
                 this.instance = new Viewer(document.querySelector('.gallery'), {
                     ...CONFIG.viewerParams,
-                    url: 'data-src'
+                    url: 'data-src',
+                    hidden: () => {
+                        if (this.pendingUpdate) {
+                            this.pendingUpdate = false;
+                            this.update();
+                        }
+                    }
                 });
                 this.firstUpdate = true;
             },
             update() {
                 if (!this.instance) return;
+                if (this.instance.visible) {
+                    this.pendingUpdate = true;
+                    return;
+                }
                 clearTimeout(this.timer);
                 const delay = this.firstUpdate ? 0 : 100;
                 this.firstUpdate = false;
@@ -906,16 +917,27 @@ function danyeHtml(imgSrc, viewer, tag, style) {
             instance: null,
             timer: null,
             firstUpdate: true,
+            pendingUpdate: false,
             init() {
                 if (this.instance) return;
                 this.instance = new Viewer(document.querySelector('.gallery'), {
                     ...CONFIG.viewerParams,
-                    url: 'data-src'
+                    url: 'data-src',
+                    hidden: () => {
+                        if (this.pendingUpdate) {
+                            this.pendingUpdate = false;
+                            this.update();
+                        }
+                    }
                 });
                 this.firstUpdate = true;
             },
             update() {
                 if (!this.instance) return;
+                if (this.instance.visible) {
+                    this.pendingUpdate = true;
+                    return;
+                }
                 clearTimeout(this.timer);
                 const delay = this.firstUpdate ? 0 : 100;
                 this.firstUpdate = false;
