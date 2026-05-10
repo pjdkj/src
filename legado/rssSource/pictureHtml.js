@@ -264,6 +264,13 @@ function duoyeHtml(config) {
                 this.instance = new Viewer(document.querySelector('.gallery'), {
                     ...CONFIG.viewerParams,
                     url: 'data-src',
+                    shown: () => {
+                        if (this.timer) {
+                            clearTimeout(this.timer);
+                            this.timer = null;
+                            this.pendingUpdate = true;
+                        }
+                    },
                     hidden: () => {
                         if (this.pendingUpdate) {
                             this.pendingUpdate = false;
@@ -927,6 +934,13 @@ function danyeHtml(imgSrc, viewer, tag, style) {
                 this.instance = new Viewer(document.querySelector('.gallery'), {
                     ...CONFIG.viewerParams,
                     url: 'data-src',
+                    shown: () => {
+                        if (this.timer) {
+                            clearTimeout(this.timer);
+                            this.timer = null;
+                            this.pendingUpdate = true;
+                        }
+                    },
                     hidden: () => {
                         if (this.pendingUpdate) {
                             this.pendingUpdate = false;
