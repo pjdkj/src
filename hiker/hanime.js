@@ -183,19 +183,12 @@ function homePage() {
     //log(url);
     let layout_style = 'movie_2';
 
-    var cfHtml = getVar('hanime_cf_html', '');
-    var res;
-    if (cfHtml) {
-        clearVar('hanime_cf_html');
-        res = cfHtml;
-    } else {
-        var cfCookie = getVar('hanime_cf_cookie', '');
-        var fetchOptions = {};
-        if (cfCookie) {
-            fetchOptions = {headers: {Cookie: cfCookie}};
-        }
-        res = fetch(url, fetchOptions);
+    var cfCookie = getVar('hanime_cf_cookie', '');
+    var fetchOptions = {};
+    if (cfCookie) {
+        fetchOptions = {headers: {Cookie: cfCookie}};
     }
+    var res = fetch(url, fetchOptions);
     var cfDetected = false;
     if (res.indexOf('Just a moment') !== -1 || res.indexOf('#cfts') !== -1 || res.indexOf('_cf_chl_opt') !== -1) {
         cfDetected = true;
@@ -206,38 +199,17 @@ function homePage() {
         }
         layouts.push({
             title: '检测到CF验证，点击进入验证',
-            url: $('hiker://empty' + privacyMode).rule((targetUrl) => {
-                var d = [];
-                d.push({
-                    col_type: 'x5_webview_single',
-                    url: targetUrl,
-                    desc: 'list&&screen',
-                    extra: {
-                        ua: 'Mozilla/5.0 (Linux; Android 16; 2211133C Build/BP2A.250605.031.A3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.7727.138 Mobile Safari/537.36',
-                        showProgress: false,
-                        js: $.toString((targetUrl) => {
-                            fba.setWebUa('Mozilla/5.0 (Linux; Android 16; 2211133C Build/BP2A.250605.031.A3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.7727.138 Mobile Safari/537.36');
-                            function check() {
-                                var nodes = document.querySelectorAll('.video-item-container');
-                                var co = fba.getCookie(targetUrl);
-                                fba.log('checking: nodes=' + (nodes ? nodes.length : 0) + ' cookie=' + co);
-                                if (nodes && nodes.length > 0 && co) {
-                                    var html = document.documentElement.outerHTML;
-                                    fba.putVar('hanime_cf_html', html);
-                                    fba.putVar('hanime_cf_cookie', co);
-                                    fba.parseLazyRule($$$().lazyRule(function () {
-                                        back();
-                                    }));
-                                } else {
-                                    setTimeout(check, 500);
-                                }
-                            }
-                            check();
-                        }, targetUrl)
+            url: $(url).webLazy(function () {
+                var checkInterval = setInterval(function () {
+                    var nodes = document.querySelectorAll('.video-item-container');
+                    var co = fba.getCookie(location.href);
+                    if (nodes && nodes.length > 0 && co) {
+                        clearInterval(checkInterval);
+                        fba.putVar('hanime_cf_cookie', co);
+                        location.href = 'hiker://empty@lazyRule=.js:back(true);return"hiker://empty"';
                     }
-                });
-                setResult(d);
-            }, url),
+                }, 500);
+            }),
             col_type: 'card_pic_1',
             img: 'hiker://images/home_pic3'
         });
