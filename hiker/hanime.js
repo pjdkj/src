@@ -183,19 +183,28 @@ function homePage() {
     //log(url);
     let layout_style = 'movie_2';
 
-    let res = fetch(url);
+    var cfCookie = getVar('hanime_cf_cookie', '');
+    var fetchOptions = {};
+    if (cfCookie) {
+        fetchOptions = {headers: {Cookie: cfCookie}};
+    }
+    var res = fetch(url, fetchOptions);
     var cfDetected = false;
     if (res.indexOf('Just a moment') !== -1 || res.indexOf('#cfts') !== -1 || res.indexOf('_cf_chl_opt') !== -1) {
         cfDetected = true;
     }
     if (cfDetected) {
+        if (cfCookie) {
+            clearVar('hanime_cf_cookie');
+        }
         layouts.push({
             title: '检测到CF验证，点击进入验证',
             url: $('hiker://empty' + privacyMode).rule((targetUrl) => {
-                let d = [];
+                var d = [];
                 d.push({
                     col_type: 'x5_webview_single',
                     url: targetUrl,
+                    desc: 'list&&screen',
                     extra: {
                         ua: MOBILE_UA,
                         js: $.toString((targetUrl) => {
@@ -203,7 +212,10 @@ function homePage() {
                                 var nodes = document.querySelectorAll('.video-item-container');
                                 var co = fba.getCookie(targetUrl);
                                 if (nodes && nodes.length > 0 && co) {
-                                    fba.parseLazyRule('hiker://empty@lazyRule=.js:back(true);return"hiker://empty"');
+                                    fba.putVar('hanime_cf_cookie', co);
+                                    fba.parseLazyRule($$$().lazyRule(function () {
+                                        back();
+                                    }));
                                 } else {
                                     setTimeout(check, 500);
                                 }
@@ -214,7 +226,8 @@ function homePage() {
                 });
                 setResult(d);
             }, url),
-            col_type: 'text_1'
+            col_type: 'card_pic_1',
+            img: 'hiker://images/home_pic3'
         });
         setResult(layouts);
         return;
