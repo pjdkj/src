@@ -183,12 +183,19 @@ function homePage() {
     //log(url);
     let layout_style = 'movie_2';
 
-    var cfCookie = getVar('hanime_cf_cookie', '');
-    var fetchOptions = {};
-    if (cfCookie) {
-        fetchOptions = {headers: {Cookie: cfCookie}};
+    var cfHtml = getVar('hanime_cf_html', '');
+    var res;
+    if (cfHtml) {
+        clearVar('hanime_cf_html');
+        res = cfHtml;
+    } else {
+        var cfCookie = getVar('hanime_cf_cookie', '');
+        var fetchOptions = {};
+        if (cfCookie) {
+            fetchOptions = {headers: {Cookie: cfCookie}};
+        }
+        res = fetch(url, fetchOptions);
     }
-    var res = fetch(url, fetchOptions);
     var cfDetected = false;
     if (res.indexOf('Just a moment') !== -1 || res.indexOf('#cfts') !== -1 || res.indexOf('_cf_chl_opt') !== -1) {
         cfDetected = true;
@@ -215,6 +222,8 @@ function homePage() {
                                 var co = fba.getCookie(targetUrl);
                                 fba.log('checking: nodes=' + (nodes ? nodes.length : 0) + ' cookie=' + co);
                                 if (nodes && nodes.length > 0 && co) {
+                                    var html = document.documentElement.outerHTML;
+                                    fba.putVar('hanime_cf_html', html);
                                     fba.putVar('hanime_cf_cookie', co);
                                     fba.parseLazyRule($$$().lazyRule(function () {
                                         back();
