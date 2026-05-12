@@ -213,7 +213,7 @@ function homePage() {
                             function check() {
                                 var nodes = document.querySelectorAll('.video-item-container');
                                 var co = fba.getCookie(targetUrl);
-                                fba.log('checking: nodes=' + (nodes ? nodes.length : 0) + ' cookie=' + (co ? 'yes' : 'no'));
+                                fba.log('checking: nodes=' + (nodes ? nodes.length : 0) + ' cookie=' + co);
                                 if (nodes && nodes.length > 0 && co) {
                                     fba.putVar('hanime_cf_cookie', co);
                                     fba.parseLazyRule($$$().lazyRule(function () {
