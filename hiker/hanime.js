@@ -183,58 +183,7 @@ function homePage() {
     //log(url);
     let layout_style = 'movie_2';
 
-    var cfCookie = getVar('hanime_cf_cookie', '');
-    var res;
-    if (cfCookie) {
-        res = fetchCodeByWebView(url, {headers: {Cookie: cfCookie}});
-    } else {
-        res = fetch(url);
-    }
-    var cfDetected = false;
-    if (res.indexOf('Just a moment') !== -1 || res.indexOf('#cfts') !== -1 || res.indexOf('_cf_chl_opt') !== -1) {
-        cfDetected = true;
-    }
-    if (cfDetected) {
-        if (cfCookie) {
-            clearVar('hanime_cf_cookie');
-        }
-        layouts.push({
-            title: '检测到CF验证，点击进入验证',
-            url: $('hiker://empty' + privacyMode).rule((input, targetUrl) => {
-                var d = [];
-                d.push({
-                    col_type: 'x5_webview_single',
-                    url: targetUrl,
-                    desc: 'list&&screen',
-                    extra: {
-                        ua: 'Mozilla/5.0 (Linux; Android 16; 2211133C Build/BP2A.250605.031.A3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.7727.138 Mobile Safari/537.36',
-                        showProgress: false,
-                        js: $.toString((targetUrl) => {
-                            fba.setWebUa('Mozilla/5.0 (Linux; Android 16; 2211133C Build/BP2A.250605.031.A3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.7727.138 Mobile Safari/537.36');
-                            function check() {
-                                var nodes = document.querySelectorAll('.video-item-container');
-                                var co = fba.getCookie(targetUrl);
-                                if (nodes && nodes.length > 0 && co) {
-                                    fba.putVar('hanime_cf_cookie', co);
-                                    fba.parseLazyRule($$$().lazyRule(function () {
-                                        back();
-                                    }));
-                                } else {
-                                    setTimeout(check, 500);
-                                }
-                            }
-                            check();
-                        }, targetUrl)
-                    }
-                });
-                setResult(d);
-            }, url),
-            col_type: 'card_pic_1',
-            img: 'hiker://images/home_pic3'
-        });
-        setResult(layouts);
-        return;
-    }
+    let res = fetch(url);
     let selector = '.horizontal-row--.video-item-container,0--.video-item-container,0&&.video-item-container';
     pdfa(res, selector).forEach(function (li) {
         try {
