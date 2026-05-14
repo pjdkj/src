@@ -183,11 +183,11 @@ function homePage() {
     //log(url);
     let layout_style = 'movie_2';
 
-    var cfHtml = getVar('hanime_cf_html', '');
-    var cfCookie = getVar('hanime_cf_cookie', '');
+    var cfHtml = getMyVar('hanime_cf_html', '');
+    var cfCookie = getMyVar('hanime_cf_cookie', '');
     var res;
     if (cfHtml) {
-        clearVar('hanime_cf_html');
+        clearMyVar('hanime_cf_html');
         res = cfHtml;
     } else if (cfCookie) {
         res = fetchCodeByWebView(url, {headers: {Cookie: cfCookie}});
@@ -200,7 +200,7 @@ function homePage() {
     }
     if (cfDetected) {
         if (cfCookie) {
-            clearVar('hanime_cf_cookie');
+            clearMyVar('hanime_cf_cookie');
         }
         layouts.push({
             col_type: 'x5_webview_single',
@@ -219,7 +219,11 @@ function homePage() {
                             fba.putVar('hanime_cf_cookie', co);
                             fba.putVar('hanime_cf_html', html);
                             fba.parseLazyRule($$$().lazyRule(function () {
-                                refreshPage();
+                                putMyVar('hanime_cf_cookie', getVar('hanime_cf_cookie'));
+                                putMyVar('hanime_cf_html', getVar('hanime_cf_html'));
+                                clearVar('hanime_cf_cookie');
+                                clearVar('hanime_cf_html');
+                                back();
                             }));
                         } else {
                             setTimeout(check, 500);
@@ -329,7 +333,7 @@ function setTags(params, iconHost) {
     let layouts = [];
 
     layouts.push({
-        title: b('X5内核'),
+        title: b('X5内核中转'),
         img: getItem('X5_mode', '0') == '1' ? 'https://raw.githubusercontent.com/pjdkj/src/main/icon/开.svg' : 'https://raw.githubusercontent.com/pjdkj/src/main/icon/关.svg',
         url: $('#noLoading#').lazyRule(() => {
             if (getItem('X5_mode', '0') == '1') {
