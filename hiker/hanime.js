@@ -184,7 +184,21 @@ function homePage() {
     let layout_style = 'movie_2';
 
     var cfHtml = getMyVar('hanime_cf_html', '');
+    if (!cfHtml) {
+        cfHtml = getVar('hanime_cf_html', '');
+        if (cfHtml) {
+            putMyVar('hanime_cf_html', cfHtml);
+            clearVar('hanime_cf_html');
+        }
+    }
     var cfCookie = getMyVar('hanime_cf_cookie', '');
+    if (!cfCookie) {
+        cfCookie = getVar('hanime_cf_cookie', '');
+        if (cfCookie) {
+            putMyVar('hanime_cf_cookie', cfCookie);
+            clearVar('hanime_cf_cookie');
+        }
+    }
     var res;
     if (cfHtml) {
         clearMyVar('hanime_cf_html');
@@ -211,20 +225,17 @@ function homePage() {
                 showProgress: false,
                 js: $.toString((targetUrl) => {
                     fba.setWebUa('Mozilla/5.0 (Linux; Android 16; 2211133C Build/BP2A.250605.031.A3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.7727.138 Mobile Safari/537.36');
+                    var _cf_done = false;
                     function check() {
+                        if (_cf_done) return;
                         var nodes = document.querySelectorAll('.video-item-container');
                         var co = fba.getCookie(targetUrl);
                         if (nodes && nodes.length > 0 && co) {
+                            _cf_done = true;
                             var html = document.documentElement.outerHTML;
                             fba.putVar('hanime_cf_cookie', co);
                             fba.putVar('hanime_cf_html', html);
-                            fba.parseLazyRule($$$().lazyRule(function () {
-                                putMyVar('hanime_cf_cookie', getVar('hanime_cf_cookie'));
-                                putMyVar('hanime_cf_html', getVar('hanime_cf_html'));
-                                clearVar('hanime_cf_cookie');
-                                clearVar('hanime_cf_html');
-                                back();
-                            }));
+                            fba.refreshPage(true);
                         } else {
                             setTimeout(check, 500);
                         }
