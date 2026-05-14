@@ -183,15 +183,19 @@ function homePage() {
     //log(url);
     let layout_style = 'movie_2';
 
+    var cfHtml = getVar('hanime_cf_html', '');
     var cfCookie = getVar('hanime_cf_cookie', '');
     var res;
-    if (cfCookie) {
+    if (cfHtml) {
+        clearVar('hanime_cf_html');
+        res = cfHtml;
+    } else if (cfCookie) {
         res = fetchCodeByWebView(url, {headers: {Cookie: cfCookie}});
     } else {
         res = fetch(url);
     }
     var cfDetected = false;
-    if (res.indexOf('Just a moment') !== -1 || res.indexOf('#cfts') !== -1 || res.indexOf('_cf_chl_opt') !== -1) {
+    if (!cfHtml && (res.indexOf('Just a moment') !== -1 || res.indexOf('#cfts') !== -1 || res.indexOf('_cf_chl_opt') !== -1)) {
         cfDetected = true;
     }
     if (cfDetected) {
@@ -211,7 +215,9 @@ function homePage() {
                         var nodes = document.querySelectorAll('.video-item-container');
                         var co = fba.getCookie(targetUrl);
                         if (nodes && nodes.length > 0 && co) {
+                            var html = document.documentElement.outerHTML;
                             fba.putVar('hanime_cf_cookie', co);
+                            fba.putVar('hanime_cf_html', html);
                             fba.parseLazyRule($$$().lazyRule(function () {
                                 refreshPage();
                             }));
