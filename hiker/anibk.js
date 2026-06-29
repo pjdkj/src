@@ -1,6 +1,5 @@
 // AniBK 动漫 - 海阔世界小程序规则
 // 网站: www.anibk.com
-// 功能: 主页浏览、搜索、详情查看、视频播放
 
 // ========== Base64 解码 (ES5 兼容) ==========
 var _base64Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
@@ -214,30 +213,7 @@ function searchVideo(key, page) {
         return layouts;
     }
 
-    // 排序按钮
-    if (page == "1") {
-        var sortParams = ["", "&order=1", "&order=30"];
-        var sortNames = ["相关度", "最新", "评分"];
-        for (var si = 0; si < sortNames.length; si++) {
-            layouts.push({
-                title: sortNames[si],
-                url: $("#noLoading#").lazyRule(function(params, names, idx) {
-                    if (getItem("searchSort", "") != params[idx]) {
-                        setItem("searchSort", params[idx]);
-                        refreshPage(false);
-                    }
-                    return "hiker://empty";
-                }, sortParams, sortNames, si),
-                col_type: "flex_button",
-                extra: {
-                    backgroundColor: getItem("searchSort", "") == sortParams[si] ? "#45DB5E" : ""
-                }
-            });
-        }
-    }
-
-    var sortParam = getItem("searchSort", "");
-    var searchUrl = baseUrl + "/list/---------?order=20&kw=" + encodeURIComponent(key) + "&page=" + page + sortParam;
+    var searchUrl = baseUrl + "/list/---------?order=20&kw=" + encodeURIComponent(key);
 
     var html;
     try {
