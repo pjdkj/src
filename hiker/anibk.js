@@ -330,7 +330,7 @@ function getDetail(url) {
     var title = pdfh(html, 'meta[property="og:title"]&&content') || pdfh(html, "h1&&Text") || pdfh(html, "title&&Text");
     if (title) {
         layouts.push({
-            title: b(title),
+            title: title,
             col_type: "text_center_1",
             extra: { lineVisible: false }
         });
@@ -359,7 +359,7 @@ function getDetail(url) {
     if (descText && descText.length > 20) {
         if (descText.length > 400) descText = descText.substring(0, 400) + "...";
         layouts.push({
-            title: small("简介: " + descText),
+            title: "简介: " + descText,
             col_type: "long_text",
             extra: { lineVisible: false }
         });
@@ -369,7 +369,7 @@ function getDetail(url) {
     var epLinkFound = false;
 
     // 正式剧集 ep-r-sub
-    var epItems = pdfa(html, ".ep-r-sub");
+    var epItems = pdfa(html, "body&&.ep-sub");
     if (epItems.length > 0) {
         layouts.push({ title: b("剧集列表"), col_type: "text_center_1", extra: { lineVisible: false } });
         for (var ei = 0; ei < epItems.length; ei++) {
@@ -386,11 +386,8 @@ function getDetail(url) {
             layouts.push({
                 title: epTitle,
                 desc: "0",
-                url: $(fullEpLink).rule(function() {
-                    require(config.依赖);
-                    setResult(getPlayPage(input));
-                }),
-                col_type: "text_3",
+                url: fullEpLink,
+                col_type: "big_big_blank_block",
             });
         }
     }
