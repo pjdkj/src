@@ -223,7 +223,7 @@ function searchVideo(key, page) {
         return layouts;
     }
 
-    var items = pdfa(html, ".vsub");
+    var items = pdfa(html, "body&&.vsub");
     for (var i = 0; i < items.length; i++) {
         var item = items[i];
         try {
@@ -247,11 +247,11 @@ function searchVideo(key, page) {
                 title: itemTitle,
                 img: itemImg + '@headers={"Referer":"https://www.anibk.com/"}',
                 desc: desc,
-                url: $(fullLink).rule(function() {
+                url: $().rule((link) => {
                     require(config.依赖);
-                    setResult(getDetail(input));
-                }),
-                col_type: "movie_2",
+                    setResult(getDetail(link));
+                }, fullLink),
+                col_type: "movie_3",
             });
         } catch (e) { }
     }
